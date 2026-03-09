@@ -1,0 +1,191 @@
+/*
+ * maincpp.cpp
+ *
+ *  Created on: May 24, 2025
+ *      Author: froilan
+ */
+
+// #include <main.h>
+#include <ADCBase.hpp>
+#include <ButtonPullup.hpp>
+#include <ControllerBase.hpp>
+#include <FlashMemory.hpp>
+#include <FuraA.hpp>
+#include <FuraB.hpp>
+#include <FuraC.hpp>
+#include <FuraD.hpp>
+#include <IRReceiver.hpp>
+#include <LedBase.hpp>
+#include <MotorOneShot125.hpp>
+#include <TestA.hpp>
+#include <TestBase.hpp>
+#include <TestC.hpp>
+#include <TestD.hpp>
+#include <TestE.hpp>
+#include <TestG.hpp>
+#include <TestH.hpp>
+#include <TestI.hpp>
+#include <TestVoid.hpp>
+#include <Timer11Delay.hpp>
+#include <TrackerBase.hpp>
+#include <UartComm.hpp>
+#include <UartSerial.hpp>
+#include <maincpp.hpp>
+#include <message_types.hpp>
+
+ControllerBase controller;
+TestBase *current_test = nullptr;
+FuraD fura_run(&controller);
+
+// Variable para contar los mensajes enviados/recibidos
+volatile int message_counter = 0;
+
+void main_gym_mode(UART_HandleTypeDef *huart1, UART_HandleTypeDef *huart2,
+                   TIM_HandleTypeDef *htim4, TIM_HandleTypeDef *htim11,
+                   ADC_HandleTypeDef *hadc1, uint16_t *adc_values_value, uint16_t num_adc_channels_value) {
+  std::string menu =
+      "\r\n"
+      "Client v4 ECO\r\n";
+  std::vector<std::string> option_list = {};
+  UartSerial uartSerial(huart1, menu, &option_list);
+  UartComm uartComm(huart2, &uartSerial);
+  TimerDWT timerDWT;
+  Timer11Delay timer11Delay(htim11);
+  ADCBase adc(hadc1, adc_values_value, num_adc_channels_value);
+  TrackerBase tracker_left(&adc, 0);    // PA1
+  TrackerBase tracker_right(&adc, 1);   // PA2
+  TrackerBase distance_left(&adc, 2);   // PA0
+  TrackerBase distance_right(&adc, 3);  // PA4
+
+  MotorOneShot125 motor_left(htim4, TIM_CHANNEL_1, &(htim4->Instance->CCR1));
+  MotorOneShot125 motor_right(htim4, TIM_CHANNEL_2, &(htim4->Instance->CCR2));
+
+  ButtonPullup button_start(GPIOB, GPIO_PIN_13, true);
+  bool led_reverse = true;
+  LedBase led_start(GPIOC, GPIO_PIN_13, led_reverse);
+
+  controller.init_gym_mode_fura(&uartSerial, &uartComm,
+                                &timerDWT, &timer11Delay, &adc,
+                                &tracker_left, &tracker_right,
+                                &distance_left, &distance_right,
+                                &motor_left, &motor_right,
+                                &button_start, &led_start);
+  current_test = new TestVoid(&controller);
+
+  while (1) {
+    if (current_test->getGroup() == controller.getRxGroup()) {
+      current_test->sendData();
+    } else {
+      HAL_Delay(1);
+    }
+  }
+}
+
+void main_fura_mode(TIM_HandleTypeDef *htim2, TIM_HandleTypeDef *htim4,
+                    ADC_HandleTypeDef *hadc1, uint16_t *adc_values_value, uint16_t num_adc_channels_value) {
+  ADCBase adc(hadc1, adc_values_value, num_adc_channels_value);
+  TrackerBase tracker_left(&adc, 0);  // PA1
+  bool led_reverse = false;
+  LedBase led_tracker_left(GPIOA, GPIO_PIN_15, led_reverse);
+  TrackerBase tracker_right(&adc, 1);  // PA2
+  LedBase led_tracker_right(GPIOB, GPIO_PIN_3, led_reverse);
+  TrackerBase distance_left(&adc, 2);  // PA0
+  LedBase led_distance_left(GPIOA, GPIO_PIN_12, led_reverse);
+  TrackerBase distance_right(&adc, 3);  // PA4
+  LedBase led_distance_right(GPIOB, GPIO_PIN_4, led_reverse);
+  TrackerBase distance_lateral_left(&adc, 4);  // PA4
+  LedBase led_distance_lateral_left(GPIOA, GPIO_PIN_11, led_reverse);
+  TrackerBase distance_lateral_right(&adc, 5);  // PA6
+  LedBase led_distance_lateral_right(GPIOB, GPIO_PIN_5, led_reverse);
+  TrackerBase distance_central(&adc, 6);  // PA6
+  LedBase led_distance_central(GPIOA, GPIO_PIN_8, led_reverse);
+
+  MotorOneShot125 motor_left(htim4, TIM_CHANNEL_2, &(htim4->Instance->CCR2));
+  MotorOneShot125 motor_right(htim4, TIM_CHANNEL_1, &(htim4->Instance->CCR1));
+
+  bool reverse = true;
+  ButtonPullup button_start(GPIOB, GPIO_PIN_13, reverse);
+  IRReceiver ir_receiver(htim2, TIM_CHANNEL_3);
+  led_reverse = true;
+  LedBase led_start(GPIOC, GPIO_PIN_13, led_reverse);
+  ButtonPullup sensor_tilting(GPIOB, GPIO_PIN_12, reverse);  // Desactivado temporalmente
+
+  FlashMemory flash_memory;
+
+  controller.init_fura_mode_fura(&adc,
+                                 &tracker_left, &led_tracker_left,
+                                 &tracker_right, &led_tracker_right,
+                                 &distance_left, &led_distance_left,
+                                 &distance_right, &led_distance_right,
+                                 &distance_lateral_left, &led_distance_lateral_left,
+                                 &distance_lateral_right, &led_distance_lateral_right,
+                                 &distance_central, &led_distance_central,
+                                 &motor_left, &motor_right,
+                                 &button_start, &ir_receiver, &led_start,
+                                 &sensor_tilting,
+                                 &flash_memory);
+  while (1) {
+    fura_run.main();
+  }
+}
+
+void HAL_UART_RxCpltCallback_cpp(UART_HandleTypeDef *huart) {
+  if (huart->Instance == USART1)  // Verifica que sea el UART correcto
+  {
+    // Llama al método de la clase UartSerial para manejar la recepción
+    controller.commReset();  // Reinicia la recepción para el siguiente mensaje
+    if (controller.getRxGroup() != '\0') {
+      controller.endRxTransaction();
+      delete current_test;
+      current_test = new TestVoid(&controller);
+    }
+    controller.serialReceivedData(huart);
+  } else if (huart->Instance == USART2) {
+    // Hemos recibido un mensaje completo
+    controller.commReceivedData(huart);
+    if (controller.getRxGroup() != current_test->getGroup()) {
+      switch (controller.getRxGroup()) {
+        case '\0':
+          current_test = new TestVoid(&controller);
+          break;
+        case 'A':
+          current_test = new TestA(&controller);
+          break;
+        case 'C':
+          current_test = new TestC(&controller);
+          break;
+        case 'D':
+          current_test = new TestD(&controller);
+          break;
+        case 'E':
+          current_test = new TestE(&controller);
+          break;
+        case 'G':
+          current_test = new TestG(&controller);
+          break;
+        case 'H':
+          current_test = new TestH(&controller);
+          break;
+        case 'I':
+          current_test = new TestI(&controller);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+}
+
+void HAL_GPIO_EXTI_Callback_cpp(uint16_t GPIO_Pin) {
+  if (GPIO_Pin == GPIO_PIN_13) {
+    controller.getButtonStart()->actualizaEstado();
+  } else if (GPIO_Pin == GPIO_PIN_12) {
+    controller.getSensorTilting()->actualizaEstado();
+  }
+}
+
+void HAL_TIM_IC_CaptureCallback_cpp(TIM_HandleTypeDef *htim) {
+  if (htim->Instance == TIM2 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) {
+    controller.getIRReceiver()->adquireData();
+  }
+}

@@ -1,0 +1,3 @@
+[submodule "Utils"]
+	path = Utils
+	url = git@github.com:tensorgrass/Stm32CppUtils2026.git
