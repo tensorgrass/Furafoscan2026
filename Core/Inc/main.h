@@ -59,6 +59,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define TOF_RIGHT_Pin GPIO_PIN_15
+#define TOF_RIGHT_GPIO_Port GPIOA
+#define TOF_CENTER_Pin GPIO_PIN_3
+#define TOF_CENTER_GPIO_Port GPIOB
+#define TOF_LEFT_Pin GPIO_PIN_4
+#define TOF_LEFT_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
