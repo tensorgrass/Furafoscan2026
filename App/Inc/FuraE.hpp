@@ -1,5 +1,5 @@
-#ifndef FURAD_HPP
-#define FURAD_HPP
+#ifndef FURAE_HPP
+#define FURAE_HPP
 
 #define FLASH_DATA_VERSION 3
 #define FLASH_DATA_NUM_VALUES 5
@@ -109,9 +109,9 @@
 
 #include <ControllerBase.hpp>
 
-class FuraD {
+class FuraE {
  public:
-  FuraD(ControllerBase* controllerBaseValue);
+  FuraE(ControllerBase* controllerBaseValue);
 
   void main();
 
@@ -282,4 +282,4 @@ class FuraD {
   void setDirectionRight();  // deprecated
 };
 
-#endif  // FURAD_HPP
+#endif  // FURAE_HPP

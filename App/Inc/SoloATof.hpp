@@ -1,5 +1,5 @@
-#ifndef FURAE_HPP
-#define FURAE_HPP
+#ifndef SOLOATOF_HPP
+#define SOLOATOF_HPP
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,4 +11,4 @@ void test_soloatof(void);
 }
 #endif
 
-#endif  // FURAE_HPP
+#endif  // SOLOATOF_HPP

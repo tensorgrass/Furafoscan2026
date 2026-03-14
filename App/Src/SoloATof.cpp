@@ -3,7 +3,7 @@
 #define MIN_DITANCE 0
 #define MAX_DITANCE 500
 
-#define DEV_CENTER 0x57
+#define DEV_CENTER 0x23
 #define DEV_LEFT 0x24
 #define DEV_RIGHT 0x26
 
@@ -18,9 +18,9 @@ uint16_t distance_right;
 // prueba boton 3 segundos para arrancar
 extern "C" void test_soloatof(void) {
 
-	TofVL53L4CD2 distance_tof_center = TofVL53L4CD2(GPIOB, GPIO_PIN_3);
-	TofVL53L4CD2 distance_tof_left = TofVL53L4CD2(GPIOB, GPIO_PIN_4);
-	TofVL53L4CD2 distance_tof_right = TofVL53L4CD2(GPIOA, GPIO_PIN_15);
+	TofVL53L4CD2 distance_tof_center(GPIOB, GPIO_PIN_3);
+	TofVL53L4CD2 distance_tof_left(GPIOB, GPIO_PIN_4);
+	TofVL53L4CD2 distance_tof_right(GPIOA, GPIO_PIN_15);
 	distance_tof_center.init(DEV_CENTER);
 	distance_tof_left.init(DEV_LEFT);
 	distance_tof_right.init(DEV_RIGHT);

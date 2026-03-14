@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <maincpp.hpp> // Incluir la clase puente cpp
 #include <SoloATof.hpp>
+#include <SoloBGyro.hpp>
 #include <VL53L4CD_api.h>
 /* USER CODE END Includes */
 
@@ -81,7 +82,7 @@ static void MX_I2C1_Init(void);
 //PA7 tracker distance left
 //PA0 tracker distance right
 
-#define SOLO_MODE
+//#define SOLO_MODE
 
 #define NUM_ADC_CHANNELS    2
 
@@ -128,10 +129,15 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   #ifdef SOLO_MODE
-    test_soloatof();
+//    test_soloatof();
+  	  test_solobgyro(&hi2c1);
   #else
-    main_fura_mode(&htim2, &htim4,
-                   &hadc1, adc_values, NUM_ADC_CHANNELS);
+    main_fura_mode(&htim2,
+    		       &htim4,
+                   &hadc1,
+				   &hi2c1,
+				   adc_values,
+				   NUM_ADC_CHANNELS);
   #endif
   /* USER CODE END 2 */
 

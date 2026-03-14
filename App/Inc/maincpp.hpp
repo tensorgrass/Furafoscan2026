@@ -14,13 +14,16 @@ extern "C" {
 
 #include <stm32f4xx_hal.h>
 
+#define TOF_ADDR_LEFT 0x24
+#define TOF_ADDR_RIGHT 0x26
+#define TOF_ADDR_CENTER 0x23
 
-void main_gym_mode(UART_HandleTypeDef *huart1, UART_HandleTypeDef *huart2,
-                   TIM_HandleTypeDef *htim4, TIM_HandleTypeDef *htim11,
-                   ADC_HandleTypeDef *hadc1, uint16_t* adc_values_value, uint16_t num_adc_channels_value);
-
-void main_fura_mode(TIM_HandleTypeDef *htim2, TIM_HandleTypeDef *htim4,
-                    ADC_HandleTypeDef *hadc1, uint16_t* adc_values_value, uint16_t num_adc_channels_value);
+void main_fura_mode(TIM_HandleTypeDef *htim2,
+		            TIM_HandleTypeDef *htim4,
+                    ADC_HandleTypeDef *hadc1,
+					I2C_HandleTypeDef *hi2c1,
+					uint16_t* adc_values_value,
+					uint16_t num_adc_channels_value);
 
 void HAL_UART_RxCpltCallback_cpp(UART_HandleTypeDef *huart);
 

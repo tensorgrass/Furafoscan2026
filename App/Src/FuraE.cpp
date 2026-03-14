@@ -1,8 +1,8 @@
-#include "FuraD.hpp"
+#include "FuraE.hpp"
 
-FuraD::FuraD(ControllerBase* controllerBaseValue)
+FuraE::FuraE(ControllerBase* controllerBaseValue)
     : controller(controllerBaseValue) {
-  // Constructor de FuraD, inicializa el controlador y los objetos UART
+  // Constructor de FuraE, inicializa el controlador y los objetos UART
   current_step = enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED;
   current_step_init = true;
   direction_base = enum_direction::DIR_CENTER;
@@ -18,7 +18,7 @@ FuraD::FuraD(ControllerBase* controllerBaseValue)
 }
 
 // prueba boton 5 segundos para arrancar y arrancar el motor
-void FuraD::main() {
+void FuraE::main() {
   switch (current_step) {
     case enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED:
       if (current_step_init) {
@@ -823,12 +823,12 @@ void FuraD::main() {
   }
 }
 
-void FuraD::goNextStep(enum_step_fura next_step) {
+void FuraE::goNextStep(enum_step_fura next_step) {
   current_step = next_step;
   current_step_init = true;
 }
 
-void FuraD::detectButtonStop() {
+void FuraE::detectButtonStop() {
   if (controller->getButtonStart()->isButtonPressed()) {
     HAL_Delay(1);
     // volvemos a leer el valor del motor para descartar rebotes
@@ -872,7 +872,7 @@ void FuraD::detectButtonStop() {
   }
 }
 
-void FuraD::detectTimeOut(enum_step_fura next_step, uint32_t time_out) {
+void FuraE::detectTimeOut(enum_step_fura next_step, uint32_t time_out) {
   if (time_out__time_tick_ini == 0) {
     // Se ha dejado de detectar al oponente
     time_out__time_tick_ini = HAL_GetTick();
@@ -890,7 +890,7 @@ void FuraD::detectTimeOut(enum_step_fura next_step, uint32_t time_out) {
   }
 }
 
-void FuraD::detectSensorTiltingIn(enum_step_fura next_step) {
+void FuraE::detectSensorTiltingIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_SENSOR_TILTING
   if (controller->getSensorTilting()->isButtonPressed()) {
     // Se ha empezado a detectar al oponente
@@ -926,7 +926,7 @@ void FuraD::detectSensorTiltingIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectSensorTiltingOut(enum_step_fura next_step, uint32_t time_out_detect) {
+void FuraE::detectSensorTiltingOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_CENTER
   if (!controller->getSensorTilting()->isButtonPressed()) {
     #ifdef F_D_ACTIVE_LED_SENSOR_TILTING
@@ -962,7 +962,7 @@ void FuraD::detectSensorTiltingOut(enum_step_fura next_step, uint32_t time_out_d
 #endif
 }
 
-void FuraD::detectTrakerLeftIn(enum_step_fura next_step) {
+void FuraE::detectTrakerLeftIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_TRACKER_SENSOR_LEFT
   // Detectamos si el tracker izquierdo toca la linea exterior
   tracker_left_in__tracker_value = controller->getTrackerLeft()->getValue();
@@ -1002,7 +1002,7 @@ void FuraD::detectTrakerLeftIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectTrakerLeftOut(enum_step_fura next_step, uint32_t time_out_of_line) {
+void FuraE::detectTrakerLeftOut(enum_step_fura next_step, uint32_t time_out_of_line) {
 #ifdef F_D_ACTIVE_TRACKER_SENSOR_LEFT
   // Detectamos que el tracker izquierdo deja de detectar la linea exterior
   tracker_left_out__tracker_value = controller->getTrackerLeft()->getValue();
@@ -1043,7 +1043,7 @@ void FuraD::detectTrakerLeftOut(enum_step_fura next_step, uint32_t time_out_of_l
 }
 
 
-void FuraD::detectTrakerRightIn(enum_step_fura next_step) {
+void FuraE::detectTrakerRightIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_TRACKER_SENSOR_RIGHT
   // Detectamos si el tracker derecho toca la linea exterior
   tracker_right_in__tracker_value = controller->getTrackerRight()->getValue();
@@ -1082,7 +1082,7 @@ void FuraD::detectTrakerRightIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectTrakerRightOut(enum_step_fura next_step, uint32_t time_out_of_line) {
+void FuraE::detectTrakerRightOut(enum_step_fura next_step, uint32_t time_out_of_line) {
 #ifdef F_D_ACTIVE_TRACKER_SENSOR_RIGHT
   // Movimiento del servo
   tracker_right_out__tracker_value = controller->getTrackerRight()->getValue();
@@ -1122,7 +1122,7 @@ void FuraD::detectTrakerRightOut(enum_step_fura next_step, uint32_t time_out_of_
 #endif
 }
 
-void FuraD::detectDistanceLateralLeftIn(enum_step_fura next_step) {
+void FuraE::detectDistanceLateralLeftIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_LATERAL_LEFT
   distance_lateral_left_in__distance_value = controller->getDistanceLateralLeft()->getValue();
   if (distance_lateral_left_in__distance_value > F_D_DISTANCE_LATERAL_LEFT_IN_DETECT_LINE) {
@@ -1159,7 +1159,7 @@ void FuraD::detectDistanceLateralLeftIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectDistanceLateralLeftOut(enum_step_fura next_step, uint32_t time_out_detect) {
+void FuraE::detectDistanceLateralLeftOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_LATERAL_LEFT
   distance_lateral_left_out__distance_value = controller->getDistanceLateralLeft()->getValue();
   if (distance_lateral_left_out__distance_value < F_D_DISTANCE_LATERAL_LEFT_OUT_DETECT_LINE) {
@@ -1197,7 +1197,7 @@ void FuraD::detectDistanceLateralLeftOut(enum_step_fura next_step, uint32_t time
 #endif
 }
 
-void FuraD::detectDistanceLeftIn(enum_step_fura next_step) {
+void FuraE::detectDistanceLeftIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_LEFT
   distance_left_in__distance_value = controller->getDistanceLeft()->getValue();
   if (distance_left_in__distance_value > F_D_DISTANCE_LEFT_IN_DETECT_LINE) {
@@ -1234,7 +1234,7 @@ void FuraD::detectDistanceLeftIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectDistanceLeftOut(enum_step_fura next_step, uint32_t time_out_detect) {
+void FuraE::detectDistanceLeftOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_LEFT
   distance_left_out__distance_value = controller->getDistanceLeft()->getValue();
   if (distance_left_out__distance_value < F_D_DISTANCE_LEFT_OUT_DETECT_LINE) {
@@ -1272,7 +1272,7 @@ void FuraD::detectDistanceLeftOut(enum_step_fura next_step, uint32_t time_out_de
 #endif
 }
 
-void FuraD::detectDistanceLateralRightIn(enum_step_fura next_step) {
+void FuraE::detectDistanceLateralRightIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_LATERAL_RIGHT
   distance_lateral_right_in__distance_value = controller->getDistanceLateralRight()->getValue();
   if (distance_lateral_right_in__distance_value > F_D_DISTANCE_LATERAL_RIGHT_IN_DETECT_LINE) {
@@ -1309,7 +1309,7 @@ void FuraD::detectDistanceLateralRightIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectDistanceLateralRightOut(enum_step_fura next_step, uint32_t time_out_detect) {
+void FuraE::detectDistanceLateralRightOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_LATERAL_RIGHT
   distance_lateral_right_out__distance_value = controller->getDistanceLateralRight()->getValue();
   if (distance_lateral_right_out__distance_value < F_D_DISTANCE_LATERAL_RIGHT_OUT_DETECT_LINE) {
@@ -1346,7 +1346,7 @@ void FuraD::detectDistanceLateralRightOut(enum_step_fura next_step, uint32_t tim
 #endif
 }
 
-void FuraD::detectDistanceRightIn(enum_step_fura next_step) {
+void FuraE::detectDistanceRightIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_RIGHT
   distance_right_in__distance_value = controller->getDistanceRight()->getValue();
   if (distance_right_in__distance_value > F_D_DISTANCE_RIGHT_IN_DETECT_LINE) {
@@ -1383,7 +1383,7 @@ void FuraD::detectDistanceRightIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_detect) {
+void FuraE::detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_RIGHT
   // Detectamos que el tracker izquierdo deja de detectar la linea exterior
   distance_right_out__distance_value = controller->getDistanceRight()->getValue();
@@ -1422,7 +1422,7 @@ void FuraD::detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_d
 #endif
 }
 
-void FuraD::detectDistanceCenterIn(enum_step_fura next_step) {
+void FuraE::detectDistanceCenterIn(enum_step_fura next_step) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_CENTER
   distance_center_in__distance_value = controller->getDistanceCenter()->getValue();
   if (distance_center_in__distance_value > F_D_DISTANCE_CENTER_IN_DETECT_LINE) {
@@ -1459,7 +1459,7 @@ void FuraD::detectDistanceCenterIn(enum_step_fura next_step) {
 #endif
 }
 
-void FuraD::detectDistanceCenterOut(enum_step_fura next_step, uint32_t time_out_detect) {
+void FuraE::detectDistanceCenterOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_D_ACTIVE_DISTANCE_SENSOR_CENTER
   distance_center_out__distance_value = controller->getDistanceCenter()->getValue();
   if (distance_center_out__distance_value < F_D_DISTANCE_CENTER_OUT_DETECT_LINE) {
@@ -1496,7 +1496,7 @@ void FuraD::detectDistanceCenterOut(enum_step_fura next_step, uint32_t time_out_
 #endif
 }
 
-void FuraD::setMotorSpeed(uint32_t speed_left_value, uint32_t speed_right_value) {
+void FuraE::setMotorSpeed(uint32_t speed_left_value, uint32_t speed_right_value) {
   controller->getMotorLeft()->setSpeed(speed_left_value);
   controller->getMotorRight()->setSpeed(speed_right_value);
   speed_left_ini = speed_left_value;
@@ -1507,7 +1507,7 @@ void FuraD::setMotorSpeed(uint32_t speed_left_value, uint32_t speed_right_value)
   speed_refresh__time_tick_ini = 0;
 }
 
-void FuraD::setMotorSpeedRamp(uint32_t speed_left_ini_value, uint32_t speed_left_end_value, uint32_t speed_right_ini_value, uint32_t speed_right_end_value) {
+void FuraE::setMotorSpeedRamp(uint32_t speed_left_ini_value, uint32_t speed_left_end_value, uint32_t speed_right_ini_value, uint32_t speed_right_end_value) {
   if (speed_left_ini_value <= speed_left_ini) {
     if (speed_left_end_value <= speed_left_ini) {
       speed_left_ini = speed_left_end_value;
@@ -1536,7 +1536,7 @@ void FuraD::setMotorSpeedRamp(uint32_t speed_left_ini_value, uint32_t speed_left
   speed_refresh__time_tick_ini = 0;
 }
 
-void FuraD::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed_ramp_value_increment) {
+void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed_ramp_value_increment) {
   if (speed_left_ini != speed_left_end || speed_right_ini != speed_right_end) {
     if (speed_ramp__time_tick_ini == 0) {
       // Iniciamos el contador de tiempo
@@ -1581,21 +1581,21 @@ void FuraD::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
   }
 }
 
-void FuraD::setDirectionCenter() {
+void FuraE::setDirectionCenter() {
   if (direction_base != enum_direction::DIR_CENTER) {
     direction_base = enum_direction::DIR_CENTER;
     esc_speed_base_left = F_D_ESC_BASE_SPEED_LEFT;
     esc_speed_base_right = F_D_ESC_BASE_SPEED_RIGHT;
   }
 }
-void FuraD::setDirectionLeft() {
+void FuraE::setDirectionLeft() {
   if (direction_base != enum_direction::DIR_LEFT) {
     direction_base = enum_direction::DIR_LEFT;
     esc_speed_base_left = F_D_ESC_BASE_SLOW;
     esc_speed_base_right = F_D_ESC_BASE_FAST;
   }
 }
-void FuraD::setDirectionRight() {
+void FuraE::setDirectionRight() {
   if (direction_base != enum_direction::DIR_RIGHT) {
     direction_base = enum_direction::DIR_RIGHT;
     esc_speed_base_left = F_D_ESC_BASE_FAST;
