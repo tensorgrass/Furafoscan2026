@@ -4,108 +4,104 @@
 #define FLASH_DATA_VERSION 3
 #define FLASH_DATA_NUM_VALUES 5
 
-#define F_D_ACTIVE_SENSOR_TILTING
-#define F_D_ACTIVE_LED_SENSOR_TILTING
+//#define F_E_ACTIVE_SENSOR_TILTING
+//#define F_E_ACTIVE_LED_SENSOR_TILTING
 
-#define F_D_ACTIVE_TRACKER_SENSOR_LEFT
-#define F_D_ACTIVE_TRACKER_SENSOR_RIGHT
-#define F_D_ACTIVE_DISTANCE_SENSOR_LEFT
-#define F_D_ACTIVE_DISTANCE_SENSOR_RIGHT
-#define F_D_ACTIVE_DISTANCE_SENSOR_LATERAL_LEFT
-#define F_D_ACTIVE_DISTANCE_SENSOR_LATERAL_RIGHT
-#define F_D_ACTIVE_DISTANCE_SENSOR_CENTER
+#define F_E_ACTIVE_TRACKER_SENSOR_LEFT
+#define F_E_ACTIVE_TRACKER_SENSOR_RIGHT
+//#define F_E_ACTIVE_DISTANCE_SENSOR_LEFT
+//#define F_E_ACTIVE_DISTANCE_SENSOR_RIGHT
+//#define F_E_ACTIVE_DISTANCE_SENSOR_CENTER
 
-#define F_D_ACTIVE_LED_TRACKER_SENSOR_LEFT
-#define F_D_ACTIVE_LED_TRACKER_SENSOR_RIGHT
-#define F_D_ACTIVE_LED_DISTANCE_SENSOR_LEFT
-#define F_D_ACTIVE_LED_DISTANCE_SENSOR_RIGHT
-#define F_D_ACTIVE_LED_DISTANCE_SENSOR_LATERAL_LEFT
-#define F_D_ACTIVE_LED_DISTANCE_SENSOR_LATERAL_RIGHT
-#define F_D_ACTIVE_LED_DISTANCE_SENSOR_CENTER
+//#define F_E_ACTIVE_LED_TRACKER_SENSOR_LEFT
+//#define F_E_ACTIVE_LED_TRACKER_SENSOR_RIGHT
+//#define F_E_ACTIVE_LED_DISTANCE_SENSOR_LEFT
+//#define F_E_ACTIVE_LED_DISTANCE_SENSOR_RIGHT
+//#define F_E_ACTIVE_LED_DISTANCE_SENSOR_CENTER
 
-#define F_D_BUTTON_START_WAIT 4890
+#define F_E_BUTTON_START_WAIT 1000//4890
 
-#define F_D_DEFENSE_BACK_FAST 1400
-#define F_D_DEFENSE_BACK_SLOW 1650
-#define F_D_DEFENSE_SPIN_FRONT 2330
-#define F_D_DEFENSE_SPIN_BACK 1400
-#define F_D_DEFENSE_ATTACK 2450
-#define F_D_DEFENSE_LEFT_OUT_MS 600
-#define F_D_DEFENSE_RIGHT_OUT_MS 650
-#define F_D_DEFENSE_SPIN_OUT_MS 550
-#define F_D_DEFENSE_ATTACK_OUT_MS 650
+#define F_E_DEFENSE_BACK_FAST 1400
+#define F_E_DEFENSE_BACK_SLOW 1650
+#define F_E_DEFENSE_SPIN_FRONT 2330
+#define F_E_DEFENSE_SPIN_BACK 1400
+#define F_E_DEFENSE_ATTACK 2450
+#define F_E_DEFENSE_LEFT_OUT_MS 600
+#define F_E_DEFENSE_RIGHT_OUT_MS 650
+#define F_E_DEFENSE_SPIN_OUT_MS 550
+#define F_E_DEFENSE_ATTACK_OUT_MS 650
 
-#define F_D_SENSOR_TILTING_BACK_FAST 1400
-#define F_D_SENSOR_TILTING_BACK_SLOW 1650
-#define F_D_SENSOR_TILTING_IN_MS 1
-#define F_D_SENSOR_TILTING_OUT_MS 1000
+#define F_E_SENSOR_TILTING_BACK_FAST 1400
+#define F_E_SENSOR_TILTING_BACK_SLOW 1650
+#define F_E_SENSOR_TILTING_IN_MS 1
+#define F_E_SENSOR_TILTING_OUT_MS 1000
 
-#define F_D_SPEED_RAMP_TIME_INCREMENT_MS 1
-#define F_D_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS 1
-#define F_D_SPEED_RAMP_VALUE_INCREMENT 2
-#define F_D_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK 1
-#define F_D_SPEED_REFRESH_MS 10
+#define F_E_SPEED_RAMP_TIME_INCREMENT_MS 1
+#define F_E_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS 1
+#define F_E_SPEED_RAMP_VALUE_INCREMENT 2
+#define F_E_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK 1
+#define F_E_SPEED_REFRESH_MS 10
 
-#define F_D_ESC_MID_STOP 1920  // 1830-2000
-#define F_D_ESC_BASE_SPEED_RAMP_INI 2100
-#define F_D_ESC_BASE_SPEED_LEFT 2200
-#define F_D_ESC_BASE_SPEED_RIGHT 2200
-#define F_D_ESC_BASE_SLOW 2200
-#define F_D_ESC_BASE_FAST 2330
-#define F_D_ESC_TRAKER_SLOW_SPEED 2050
-#define F_D_ESC_TRACKER_SPEED 2450
-#define F_D_ESC_TRAKER_BACK 1560
-#define F_D_ESC_TRAKER_ROTATE_SLOW 1700
-#define F_D_ESC_TRAKER_ROTATE_FAST 2330
-#define F_D_ESC_TRACKER_BOTH_SPEED_FAST 2500
-#define F_D_ESC_TRACKER_BOTH_SPEED_SLOW 1760
+#define F_E_ESC_MID_STOP 1920  // 1830-2000
+#define F_E_ESC_BASE_SPEED_RAMP_INI 2100
+#define F_E_ESC_BASE_SPEED_LEFT 2200//2110//TTT2200
+#define F_E_ESC_BASE_SPEED_RIGHT 2200//2110//TTT2200
+#define F_E_ESC_BASE_SLOW 2200
+#define F_E_ESC_BASE_FAST 2330
+#define F_E_ESC_TRAKER_SLOW_SPEED 2050
+#define F_E_ESC_TRACKER_SPEED 2450
+#define F_E_ESC_TRAKER_BACK 1560//1750//TTT1560
+#define F_E_ESC_TRAKER_ROTATE_SLOW 1700
+#define F_E_ESC_TRAKER_ROTATE_FAST 2330
+#define F_E_ESC_TRACKER_BOTH_SPEED_FAST 2500
+#define F_E_ESC_TRACKER_BOTH_SPEED_SLOW 1760
 
-#define F_D_TRACKER_LEFT_IN_DETECT_LINE 3000
-#define F_D_TRACKER_LEFT_OUT_DETECT_LINE 3300
-#define F_D_TRACKER_RIGHT_IN_DETECT_LINE 3000
-#define F_D_TRACKER_RIGHT_OUT_DETECT_LINE 3300
-#define F_D_TRACKER_OUT_OF_LINE_MS 100
-#define F_D_TRACKER_ROTATE_MS 600
-#define F_D_TRACKER_OUT_OF_LINE_BOTH_MS 800
+#define F_E_TRACKER_LEFT_IN_DETECT_LINE 3000
+#define F_E_TRACKER_LEFT_OUT_DETECT_LINE 3300
+#define F_E_TRACKER_RIGHT_IN_DETECT_LINE 3000
+#define F_E_TRACKER_RIGHT_OUT_DETECT_LINE 3300
+#define F_E_TRACKER_OUT_OF_LINE_MS 100
+#define F_E_TRACKER_ROTATE_MS 300
+#define F_E_TRACKER_OUT_OF_LINE_BOTH_MS 800
 
-#define F_D_DISTANCE_SPEED_SLOW_LEFT 2200
-#define F_D_DISTANCE_SPEED_SLOW_RIGHT 2200
-#define F_D_DISTANCE_SPEED_LEFT 2380
-#define F_D_DISTANCE_SPEED_RIGHT 2380
-#define F_D_DISTANCE_LATERAL_SPEED_LEFT 2500
-#define F_D_DISTANCE_LATERAL_SPEED_RIGHT 2500
-#define F_D_DISTANCE_BOTH_SPEED 2380
-#define F_D_DISTANCE_BOTH_SPEED_BOOST 2550
+#define F_E_DISTANCE_SPEED_SLOW_LEFT 2200
+#define F_E_DISTANCE_SPEED_SLOW_RIGHT 2200
+#define F_E_DISTANCE_SPEED_LEFT 2380
+#define F_E_DISTANCE_SPEED_RIGHT 2380
+#define F_E_DISTANCE_BOTH_SPEED 2380
+#define F_E_DISTANCE_BOTH_SPEED_BOOST 2550
 
-#define F_D_DISTANCE_LEFT_IN_DETECT_LINE 1900 //1900
-#define F_D_DISTANCE_LEFT_OUT_DETECT_LINE 1600 //1800
-#define F_D_DISTANCE_RIGHT_IN_DETECT_LINE 1900
-#define F_D_DISTANCE_RIGHT_OUT_DETECT_LINE 1600
-#define F_D_DISTANCE_LATERAL_LEFT_IN_DETECT_LINE 1900
-#define F_D_DISTANCE_LATERAL_LEFT_OUT_DETECT_LINE 1600
-#define F_D_DISTANCE_LATERAL_RIGHT_IN_DETECT_LINE 1900
-#define F_D_DISTANCE_LATERAL_RIGHT_OUT_DETECT_LINE 1600
-#define F_D_DISTANCE_CENTER_IN_DETECT_LINE 2480
-#define F_D_DISTANCE_CENTER_OUT_DETECT_LINE 2390
-#define F_D_DISTANCE_IN_MS 1
-#define F_D_DISTANCE_OUT_MS 60
-#define F_D_DISTANCE_BOTH_OUT_MS 100
-#define F_D_DISTANCE_CENTER_BOOST_MS 20
-#define F_D_DISTANCE_BOTH_BOOST_OUT_MS 1000
+#define F_E_DISTANCE_LEFT_IN_DETECT_LINE 1900 //1900
+#define F_E_DISTANCE_LEFT_OUT_DETECT_LINE 1600 //1800
+#define F_E_DISTANCE_RIGHT_IN_DETECT_LINE 1900
+#define F_E_DISTANCE_RIGHT_OUT_DETECT_LINE 1600
+#define F_E_DISTANCE_CENTER_IN_DETECT_LINE 2480
+#define F_E_DISTANCE_CENTER_OUT_DETECT_LINE 2390
+#define F_E_DISTANCE_IN_MS 1
+#define F_E_DISTANCE_OUT_MS 60
+#define F_E_DISTANCE_BOTH_OUT_MS 100
+#define F_E_DISTANCE_CENTER_BOOST_MS 20
+#define F_E_DISTANCE_BOTH_BOOST_OUT_MS 1000
 
-#define F_D_REMOTE2_ON 33456510
-#define F_D_REMOTE2_OK 33474615
-#define F_D_REMOTE2_BACK 33481755
-#define F_D_REMOTE2_UP 33430755
-#define F_D_REMOTE2_DOWN 33424125
-#define F_D_REMOTE2_LEFT 33483795
-#define F_D_REMOTE2_RIGHT 33463395
+#define F_E_TOF_DISTANCE_MIN 0
+#define F_E_TOF_DISTANCE_MAX 400
+#define F_E_TOF_DISTANCE_DETECT 0
 
-#define F_D_REMOTE2_HOME 33476145
-#define F_D_REMOTE2_MENU 33472830
-#define F_D_REMOTE2_VOLUME_UP 33480990
-#define F_D_REMOTE2_VOLUME_DOWN 33460590
-#define F_D_REMOTE2_MOUSE 33428205
+#define F_E_GYRO_Y_UP 1500
+
+#define F_E_REMOTE2_ON 33456510
+#define F_E_REMOTE2_OK 33474615
+#define F_E_REMOTE2_BACK 33481755
+#define F_E_REMOTE2_UP 33430755
+#define F_E_REMOTE2_DOWN 33424125
+#define F_E_REMOTE2_LEFT 33483795
+#define F_E_REMOTE2_RIGHT 33463395
+
+#define F_E_REMOTE2_HOME 33476145
+#define F_E_REMOTE2_MENU 33472830
+#define F_E_REMOTE2_VOLUME_UP 33480990
+#define F_E_REMOTE2_VOLUME_DOWN 33460590
+#define F_E_REMOTE2_MOUSE 33428205
 
 #include <ControllerBase.hpp>
 
@@ -138,11 +134,7 @@ class FuraE {
     STEP_TRACKER_RIGHT_DETECTED,
     STEP_TRACKER_RIGHT_DETECTED__STEP2_ROTATE,
     STEP_TRACKER_RIGHT_DETECTED__STEP2_LEFT_DETECTED,
-    STEP_DISTANCE_LATERAL_LEFT_DETECTED,
-    STEP_DISTANCE_LATERAL_LEFT_DETECTED__STEP2_LEFT_DETECTED,
     STEP_DISTANCE_LEFT_DETECTED,
-    STEP_DISTANCE_LATERAL_RIGHT_DETECTED,
-    STEP_DISTANCE_LATERAL_RIGHT_DETECTED__STEP2_RIGHT_DETECTED,
     STEP_DISTANCE_RIGHT_DETECTED,
     STEP_DISTANCE_BOTH_DETECTED,
     STEP_DISTANCE_CENTER_BOOST,
@@ -169,13 +161,13 @@ class FuraE {
   uint32_t speed_refresh__time_tick_current = 0;
 
   uint8_t direction_base = enum_direction::DIR_CENTER;
-  uint32_t esc_speed_base_left = F_D_ESC_BASE_SPEED_LEFT;
-  uint32_t esc_speed_base_right = F_D_ESC_BASE_SPEED_RIGHT;
+  uint32_t esc_speed_base_left = F_E_ESC_BASE_SPEED_LEFT;
+  uint32_t esc_speed_base_right = F_E_ESC_BASE_SPEED_RIGHT;
 
-  uint32_t tracker_base_left_in_detect_line = F_D_TRACKER_LEFT_IN_DETECT_LINE;
-  uint32_t tracker_base_right_in_detect_line = F_D_TRACKER_RIGHT_IN_DETECT_LINE;
-  uint32_t tracker_base_left_out_detect_line = F_D_TRACKER_LEFT_OUT_DETECT_LINE;
-  uint32_t tracker_base_right_out_detect_line = F_D_TRACKER_RIGHT_OUT_DETECT_LINE;
+  uint32_t tracker_base_left_in_detect_line = F_E_TRACKER_LEFT_IN_DETECT_LINE;
+  uint32_t tracker_base_right_in_detect_line = F_E_TRACKER_RIGHT_IN_DETECT_LINE;
+  uint32_t tracker_base_left_out_detect_line = F_E_TRACKER_LEFT_OUT_DETECT_LINE;
+  uint32_t tracker_base_right_out_detect_line = F_E_TRACKER_RIGHT_OUT_DETECT_LINE;
   uint32_t tracker_base_iteration = 0;
   uint32_t tracker_base_lap = 0;
   std::vector<uint16_t> tracker_base_left_values;
@@ -190,13 +182,13 @@ class FuraE {
   uint32_t time_out__time_tick_ini = 0;
   uint32_t time_out__time_tick_current = 0;
 
-  bool sensor_tilting_in__button_pressed = false;
-  uint32_t sensor_tilting_in__time_tick_ini = 0;
-  uint32_t sensor_tilting_in__time_tick_current = 0;
+  int16_t sensor_gyro_in__y_value = 0;
+  uint32_t sensor_gyro_in__time_tick_ini = 0;
+  uint32_t sensor_gyro_in__time_tick_current = 0;
 
-  bool sensor_tilting_out__button_pressed = false;
-  uint32_t sensor_tilting_out__time_tick_ini = 0;
-  uint32_t sensor_tilting_out__time_tick_current = 0;
+  int16_t sensor_gyro_out__y_value = 0;
+  uint32_t sensor_gyro_out__time_tick_ini = 0;
+  uint32_t sensor_gyro_out__time_tick_current = 0;
 
   uint32_t tracker_left_in__tracker_value = 0;
   uint32_t tracker_left_in__time_tick_ini = 0;
@@ -214,14 +206,6 @@ class FuraE {
   uint32_t tracker_right_out__time_tick_ini = 0;
   uint32_t tracker_right_out__time_tick_current = 0;
 
-  uint32_t distance_lateral_left_in__distance_value = 0;
-  uint32_t distance_lateral_left_in__time_tick_ini = 0;
-  uint32_t distance_lateral_left_in__time_tick_current = 0;
-
-  uint32_t distance_lateral_left_out__distance_value = 0;
-  uint32_t distance_lateral_left_out__time_tick_ini = 0;
-  uint32_t distance_lateral_left_out__time_tick_current = 0;
-
   uint32_t distance_left_in__distance_value = 0;
   uint32_t distance_left_in__time_tick_ini = 0;
   uint32_t distance_left_in__time_tick_current = 0;
@@ -229,14 +213,6 @@ class FuraE {
   uint32_t distance_left_out__distance_value = 0;
   uint32_t distance_left_out__time_tick_ini = 0;
   uint32_t distance_left_out__time_tick_current = 0;
-
-  uint32_t distance_lateral_right_in__distance_value = 0;
-  uint32_t distance_lateral_right_in__time_tick_ini = 0;
-  uint32_t distance_lateral_right_in__time_tick_current = 0;
-
-  uint32_t distance_lateral_right_out__distance_value = 0;
-  uint32_t distance_lateral_right_out__time_tick_ini = 0;
-  uint32_t distance_lateral_right_out__time_tick_current = 0;
 
   uint32_t distance_right_in__distance_value = 0;
   uint32_t distance_right_in__time_tick_ini = 0;
@@ -256,18 +232,14 @@ class FuraE {
 
   void detectButtonStop();
   void detectTimeOut(enum_step_fura next_step, uint32_t time_out);
-  void detectSensorTiltingIn(enum_step_fura next_step);
+  void detectSensorGyroUp(enum_step_fura next_step);
   void detectSensorTiltingOut(enum_step_fura next_step, uint32_t time_out_of_line);
   void detectTrakerLeftIn(enum_step_fura next_step);
   void detectTrakerLeftOut(enum_step_fura next_step, uint32_t time_out_of_line);
   void detectTrakerRightIn(enum_step_fura next_step);
   void detectTrakerRightOut(enum_step_fura next_step, uint32_t time_out_of_line);
-  void detectDistanceLateralLeftIn(enum_step_fura next_step);
-  void detectDistanceLateralLeftOut(enum_step_fura next_step, uint32_t time_out_detect);
   void detectDistanceLeftIn(enum_step_fura next_step);
   void detectDistanceLeftOut(enum_step_fura next_step, uint32_t time_out_detect);
-  void detectDistanceLateralRightIn(enum_step_fura next_step);
-  void detectDistanceLateralRightOut(enum_step_fura next_step, uint32_t time_out_detect);
   void detectDistanceRightIn(enum_step_fura next_step);
   void detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_detect);
   void detectDistanceCenterIn(enum_step_fura next_step);

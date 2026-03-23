@@ -82,8 +82,6 @@ static void MX_I2C1_Init(void);
 //PA7 tracker distance left
 //PA0 tracker distance right
 
-//#define SOLO_MODE
-
 #define NUM_ADC_CHANNELS    2
 
 uint16_t adc_values[NUM_ADC_CHANNELS];
@@ -128,6 +126,8 @@ int main(void)
   MX_TIM2_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+//  #define SOLO_MODE
+
   #ifdef SOLO_MODE
 //    test_soloatof();
   	  test_solobgyro(&hi2c1);
