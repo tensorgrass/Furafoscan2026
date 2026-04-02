@@ -10,10 +10,10 @@
 #include <ButtonPullup.hpp>
 #include <ControllerBase.hpp>
 #include <FlashMemory.hpp>
-#include <FuraA.hpp>
-#include <FuraB.hpp>
-#include <FuraC.hpp>
-#include <FuraD.hpp>
+//#include <FuraA.hpp>
+//#include <FuraB.hpp>
+//#include <FuraC.hpp>
+//#include <FuraD.hpp>
 #include <FuraE.hpp>
 #include <IRReceiver.hpp>
 #include <LedBase.hpp>

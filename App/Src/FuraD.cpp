@@ -44,7 +44,7 @@ void FuraD::main() {
           // rebote detectado
         }
       } else if (controller->getIRReceiver()->isDataReady()) {
-        uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
+        uint32_t ir_receiver_value = controller->getIRReceiver()->getValueNec();
         switch (ir_receiver_value) {
           case F_D_REMOTE2_OK:
           case F_D_REMOTE2_UP:
@@ -122,7 +122,7 @@ void FuraD::main() {
         controller->getLedStart()->turn_off();
       }
       if (controller->getIRReceiver()->isDataReady()) {
-        uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
+        uint32_t ir_receiver_value = controller->getIRReceiver()->getValueNec();
         if (ir_receiver_value == F_D_REMOTE2_MOUSE) {
           controller->getLedStart()->turn_on();
           goNextStep(enum_step_fura::STEP_INIT_TRACKER_CALIBRATE_WHITE);
@@ -177,7 +177,7 @@ void FuraD::main() {
         controller->getLedStart()->turn_off();
       }
       if (controller->getIRReceiver()->isDataReady()) {
-        uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
+        uint32_t ir_receiver_value = controller->getIRReceiver()->getValueNec();
         if (ir_receiver_value == F_D_REMOTE2_MOUSE) {
           controller->getLedStart()->turn_on();
           goNextStep(enum_step_fura::STEP_INIT_TRACKER_CALIBRATE_BLACK);
@@ -850,7 +850,7 @@ void FuraD::detectButtonStop() {
       // Detectado rebote
     }
   } else if (controller->getIRReceiver()->isDataReady()) {
-    uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
+    uint32_t ir_receiver_value = controller->getIRReceiver()->getValueNec();
     if (ir_receiver_value == F_D_REMOTE2_OK ||
         ir_receiver_value == F_D_REMOTE2_MENU) {
       // Se ha pulsado el boton y se tiene que parar todo

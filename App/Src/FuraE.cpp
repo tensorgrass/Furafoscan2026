@@ -14,6 +14,7 @@ FuraE::FuraE(ControllerBase* controllerBaseValue)
     tracker_base_right_in_detect_line = rx_data[2];
     tracker_base_left_out_detect_line = rx_data[3];
     tracker_base_right_out_detect_line = rx_data[4];
+    rc_address = rx_data[5];
   }
 }
 
@@ -44,10 +45,16 @@ void FuraE::main() {
           // rebote detectado
         }
       } else if (controller->getIRReceiver()->isDataReady()) {
-        uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
+        uint32_t ir_receiver_value = controller->getIRReceiver()->getValueNec();
         switch (ir_receiver_value) {
-          case F_E_REMOTE2_OK:
-          case F_E_REMOTE2_UP:
+          case F_E_IR_NEC_OK:
+            controller->getLedStart()->turn_on();
+            button_stop__button_previous_state = 0;
+            setDirectionCenter();
+            step_after_button = enum_step_fura::STEP_MOTOR_START;
+            goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
+            break;
+          case F_E_IR_NEC_UP:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             setDirectionCenter();
@@ -55,28 +62,28 @@ void FuraE::main() {
             goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
             break;
 
-          case F_E_REMOTE2_LEFT:
+          case F_E_IR_NEC_LEFT:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             step_after_button = enum_step_fura::STEP_DEFENSE_LEFT;
             goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
             break;
 
-          case F_E_REMOTE2_RIGHT:
+          case F_E_IR_NEC_RIGHT:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             step_after_button = enum_step_fura::STEP_DEFENSE_RIGHT;
             goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
             break;
 
-          case F_E_REMOTE2_BACK:
+          case F_E_IR_NEC_BACK:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             step_after_button = enum_step_fura::STEP_DEFENSE_SPIN;
             goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
             break;
 
-          case F_E_REMOTE2_MOUSE:  // configurar los limites de los tracker en la pista real
+          case F_E_IR_NEC_MOUSE:  // configurar los limites de los tracker en la pista real
             button_stop__button_previous_state = 0;
             controller->getLedStart()->turn_on();
             tracker_base_lap = 0;
@@ -86,7 +93,7 @@ void FuraE::main() {
             goNextStep(enum_step_fura::STEP_INIT_TRACKER_CALIBRATE_WHITE);
             break;
 
-          case F_E_REMOTE2_MENU:  // Testear los sensores de traking y distancia, sin que funcionen los motores
+          case F_E_IR_NEC_MENU:  // Testear los sensores de traking y distancia, sin que funcionen los motores
             button_stop__button_previous_state = 0;
             controller->getLedStart()->turn_on();
             goNextStep(enum_step_fura::STEP_TEST_ALL_SENSORS);
@@ -122,8 +129,8 @@ void FuraE::main() {
         controller->getLedStart()->turn_off();
       }
       if (controller->getIRReceiver()->isDataReady()) {
-        uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
-        if (ir_receiver_value == F_E_REMOTE2_MOUSE) {
+        uint32_t ir_receiver_value = controller->getIRReceiver()->getValueNec();
+        if (ir_receiver_value == F_E_IR_NEC_MOUSE) {
           controller->getLedStart()->turn_on();
           goNextStep(enum_step_fura::STEP_INIT_TRACKER_CALIBRATE_WHITE);
         }
@@ -177,8 +184,8 @@ void FuraE::main() {
         controller->getLedStart()->turn_off();
       }
       if (controller->getIRReceiver()->isDataReady()) {
-        uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
-        if (ir_receiver_value == F_E_REMOTE2_MOUSE) {
+        uint32_t ir_receiver_value = controller->getIRReceiver()->getValueNec();
+        if (ir_receiver_value == F_E_IR_NEC_MOUSE) {
           controller->getLedStart()->turn_on();
           goNextStep(enum_step_fura::STEP_INIT_TRACKER_CALIBRATE_BLACK);
         }
@@ -212,7 +219,7 @@ void FuraE::main() {
         }
         uint32_t mid_values_left = sum_values_left / tracker_base_iteration;
         uint32_t mid_values_right = sum_values_right / tracker_base_iteration;
-        if (mid_values_left < (tracker_base_left_in_detect_line + 100) || mid_values_right < (tracker_base_right_in_detect_line + 100)) {
+        if (mid_values_left < (tracker_base_left_in_detect_line + 500) || mid_values_right < (tracker_base_right_in_detect_line + 500)) {
           tracker_base_left_in_detect_line = F_E_TRACKER_LEFT_IN_DETECT_LINE;
           tracker_base_right_in_detect_line = F_E_TRACKER_RIGHT_IN_DETECT_LINE;
           tracker_base_left_out_detect_line = F_E_TRACKER_LEFT_OUT_DETECT_LINE;
@@ -224,13 +231,11 @@ void FuraE::main() {
           tracker_base_right_out_detect_line = tracker_base_right_in_detect_line + 300;
         }
 
-        uint32_t rx_data[FLASH_DATA_NUM_VALUES];
-        rx_data[0] = FLASH_DATA_VERSION;
-        rx_data[1] = tracker_base_left_in_detect_line;
-        rx_data[2] = tracker_base_right_in_detect_line;
-        rx_data[3] = tracker_base_left_out_detect_line;
-        rx_data[4] = tracker_base_right_out_detect_line;
-        controller->getFlashMemory()->write(rx_data, FLASH_DATA_NUM_VALUES);
+        writeDataFlash(tracker_base_left_in_detect_line,
+                       tracker_base_right_in_detect_line,
+                       tracker_base_left_out_detect_line,
+                       tracker_base_right_out_detect_line,
+                       rc_address);
 
         tracker_base_left_values.clear();
         tracker_base_right_values.clear();
@@ -274,7 +279,55 @@ void FuraE::main() {
       detectDistanceLeftIn(enum_step_fura::STEP_TEST_ALL_SENSORS);
       detectDistanceRightIn(enum_step_fura::STEP_TEST_ALL_SENSORS);
       break;
+    case enum_step_fura:: STEP_WAIT_REMOTE_SUMO:
+      if (current_step_init) {
+        controller->getIRReceiver()->setRC5SumoType();
+        previous_step = current_step;
+        current_step_init = false;
 
+        setMotorSpeed(F_E_ESC_MID_STOP, F_E_ESC_MID_STOP);
+      }
+      if (controller->getIRReceiver()->isDataReady()) {
+        IRReceiver::ValueRC5Sumo value = controller->getIRReceiver()->getValueRC5Sumo();
+        uint32_t command = value.command;
+        uint32_t address = value.address;
+        switch (command) {
+          case F_E_IR_RC5SUMO_COMMAND_START_STOP: //start / stop
+            if (address == rc_address+1) { //start
+              controller->getLedStart()->turn_on();
+              button_stop__button_previous_state = 0;
+              goNextStep(step_after_button);
+              step_after_button = enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED;
+
+            }
+            else if (address == rc_address) { //stop
+              rc_num_error2=rc_num_error2;
+            }
+            else {
+              rc_num_error2++;
+            }
+            break;
+          case F_E_IR_RC5SUMO_COMMAND_PROGRAM: // program
+            rc_address = address;
+            writeDataFlash(tracker_base_left_in_detect_line,
+                           tracker_base_right_in_detect_line,
+                           tracker_base_left_out_detect_line,
+                           tracker_base_right_out_detect_line,
+                           rc_address);
+            break;
+          default:
+            rc_num_error1++;
+        }
+      }
+      else {
+        if ((HAL_GetTick() / 100) % 2 == 0) {
+          controller->getLedStart()->turn_on();
+        } else {
+          controller->getLedStart()->turn_off();
+        }
+      }
+
+      break;
     case enum_step_fura::STEP_BUTTON_START_PRESSED:
       if (current_step_init) {
         previous_step = current_step;
@@ -712,10 +765,10 @@ void FuraE::detectButtonStop() {
       // Detectado rebote
     }
   } else if (controller->getIRReceiver()->isDataReady()) {
-    uint32_t ir_receiver_value = controller->getIRReceiver()->getValue();
-    if (ir_receiver_value == F_E_REMOTE2_OK ||
-        ir_receiver_value == F_E_REMOTE2_MENU) {
-      // Se ha pulsado el boton y se tiene que parar todo
+    IRReceiver::ValueRC5Sumo value = controller->getIRReceiver()->getValueRC5Sumo();
+    uint32_t command = value.command;
+    uint32_t address = value.address;
+    if (command == F_E_IR_RC5SUMO_COMMAND_PROGRAM && address == rc_address) { //stop
       controller->getMotorLeft()->disable();
       controller->getMotorRight()->disable();
       button_stop__button_previous_state = 1;
@@ -991,7 +1044,7 @@ void FuraE::detectTrakerRightOut(enum_step_fura next_step, uint32_t time_out_of_
 void FuraE::detectDistanceLeftIn(enum_step_fura next_step) {
 #ifdef F_E_ACTIVE_DISTANCE_SENSOR_LEFT
   distance_left_in__distance_value = controller->getDistanceTofLeft()->getDistance(F_E_TOF_DISTANCE_MIN, F_E_TOF_DISTANCE_MAX);
-  if (distance_left_in__distance_value > F_E_TOF_DISTANCE_DETECT) {
+  if (distance_left_in__distance_value < F_E_TOF_DISTANCE_MAX) {
 // Se ha empezado a detectar al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_LEFT
     if (controller->getLedDistanceLeft()->get_status() == 0) controller->getLedDistanceLeft()->turn_on();
@@ -1028,7 +1081,7 @@ void FuraE::detectDistanceLeftIn(enum_step_fura next_step) {
 void FuraE::detectDistanceLeftOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_E_ACTIVE_DISTANCE_SENSOR_LEFT
   distance_left_out__distance_value = controller->getDistanceTofLeft()->getDistance(F_E_TOF_DISTANCE_MIN, F_E_TOF_DISTANCE_MAX);
-  if (distance_left_out__distance_value < F_E_DISTANCE_LEFT_OUT_DETECT_LINE) {
+  if (distance_left_out__distance_value > F_E_TOF_DISTANCE_MAX) {
 // Se ha dejado de detectar al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_LEFT
     if (controller->getLedDistanceLeft()->get_status() == 1) controller->getLedDistanceLeft()->turn_off();
@@ -1066,7 +1119,7 @@ void FuraE::detectDistanceLeftOut(enum_step_fura next_step, uint32_t time_out_de
 void FuraE::detectDistanceRightIn(enum_step_fura next_step) {
 #ifdef F_E_ACTIVE_DISTANCE_SENSOR_RIGHT
   distance_right_in__distance_value = controller->getDistanceTofRight()->getDistance(F_E_TOF_DISTANCE_MIN, F_E_TOF_DISTANCE_MAX);
-  if (distance_right_in__distance_value > F_E_TOF_DISTANCE_DETECT) {
+  if (distance_right_in__distance_value < F_E_TOF_DISTANCE_MAX) {
 // Se ha empezado a detectar al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_RIGHT
     if (controller->getLedDistanceRight()->get_status() == 0) controller->getLedDistanceRight()->turn_on();
@@ -1104,7 +1157,7 @@ void FuraE::detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_d
 #ifdef F_E_ACTIVE_DISTANCE_SENSOR_RIGHT
   // Detectamos que el tracker izquierdo deja de detectar la linea exterior
   distance_right_out__distance_value = controller->getDistanceTofRight()->getDistance(F_E_TOF_DISTANCE_MIN, F_E_TOF_DISTANCE_MAX);
-  if (distance_right_out__distance_value < F_E_DISTANCE_RIGHT_OUT_DETECT_LINE) {
+  if (distance_right_out__distance_value > F_E_TOF_DISTANCE_MAX) {
     // Se ha dejado de detectar al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_RIGHT
     if (controller->getLedDistanceRight()->get_status() == 1) controller->getLedDistanceRight()->turn_off();
@@ -1142,7 +1195,7 @@ void FuraE::detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_d
 void FuraE::detectDistanceCenterIn(enum_step_fura next_step) {
 #ifdef F_E_ACTIVE_DISTANCE_SENSOR_CENTER
   distance_center_in__distance_value = controller->getDistanceTofCenter()->getDistance(F_E_TOF_DISTANCE_MIN, F_E_TOF_DISTANCE_MAX);
-  if (distance_center_in__distance_value > F_E_TOF_DISTANCE_DETECT) {
+  if (distance_center_in__distance_value < F_E_TOF_DISTANCE_MAX) {
 // Se ha empezado a detectar al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_CENTER
     if (controller->getLedDistanceCenter()->get_status() == 0) controller->getLedDistanceCenter()->turn_on();
@@ -1179,7 +1232,7 @@ void FuraE::detectDistanceCenterIn(enum_step_fura next_step) {
 void FuraE::detectDistanceCenterOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_E_ACTIVE_DISTANCE_SENSOR_CENTER
   distance_center_out__distance_value = controller->getDistanceTofCenter()->getDistance(F_E_TOF_DISTANCE_MIN, F_E_TOF_DISTANCE_MAX);
-  if (distance_center_out__distance_value < F_E_DISTANCE_CENTER_OUT_DETECT_LINE) {
+  if (distance_center_out__distance_value > F_E_TOF_DISTANCE_MAX) {
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_CENTER
     if (controller->getLedDistanceCenter()->get_status() == 1) controller->getLedDistanceCenter()->turn_off();
     #endif
@@ -1318,4 +1371,19 @@ void FuraE::setDirectionRight() {
     esc_speed_base_left = F_E_ESC_BASE_FAST;
     esc_speed_base_right = F_E_ESC_BASE_SLOW;
   }
+}
+
+void FuraE::writeDataFlash(uint32_t tracker_base_left_in_detect_line_value,
+                           uint32_t tracker_base_right_in_detect_line_value,
+                           uint32_t tracker_base_left_out_detect_line_value,
+                           uint32_t tracker_base_right_out_detect_line_value,
+                           uint32_t rc_address_value) {
+  uint32_t rx_data[FLASH_DATA_NUM_VALUES];
+  rx_data[0] = FLASH_DATA_VERSION;
+  rx_data[1] = tracker_base_left_in_detect_line_value;
+  rx_data[2] = tracker_base_right_in_detect_line_value;
+  rx_data[3] = tracker_base_left_out_detect_line_value;
+  rx_data[4] = tracker_base_right_out_detect_line_value;
+  rx_data[5] = rc_address_value;
+  controller->getFlashMemory()->write(rx_data, FLASH_DATA_NUM_VALUES);
 }
