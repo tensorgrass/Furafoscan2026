@@ -1,7 +1,6 @@
 #include "FuraE.hpp"
 
-FuraE::FuraE(ControllerBase* controllerBaseValue)
-    : controller(controllerBaseValue) {
+FuraE::FuraE(ControllerBase* controllerBaseValue) : controller(controllerBaseValue) {
   // Constructor de FuraE, inicializa el controlador y los objetos UART
   current_step = enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED;
   current_step_init = true;
@@ -15,6 +14,12 @@ FuraE::FuraE(ControllerBase* controllerBaseValue)
     tracker_base_left_out_detect_line = rx_data[3];
     tracker_base_right_out_detect_line = rx_data[4];
     rc_address = rx_data[5];
+  }
+
+  if (furafosca_type == 1) {
+    config_motor = &Configs::Furafoscan1;
+  } else {
+    config_motor = &Configs::Furafoscan2;
   }
 }
 
@@ -220,10 +225,10 @@ void FuraE::main() {
         uint32_t mid_values_left = sum_values_left / tracker_base_iteration;
         uint32_t mid_values_right = sum_values_right / tracker_base_iteration;
         if (mid_values_left < (tracker_base_left_in_detect_line + 500) || mid_values_right < (tracker_base_right_in_detect_line + 500)) {
-          tracker_base_left_in_detect_line = F_E_TRACKER_LEFT_IN_DETECT_LINE;
-          tracker_base_right_in_detect_line = F_E_TRACKER_RIGHT_IN_DETECT_LINE;
-          tracker_base_left_out_detect_line = F_E_TRACKER_LEFT_OUT_DETECT_LINE;
-          tracker_base_right_out_detect_line = F_E_TRACKER_RIGHT_OUT_DETECT_LINE;
+          tracker_base_left_in_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_LEFT_IN_DETECT_LINE].value;
+          tracker_base_right_in_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE].value;
+          tracker_base_left_out_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_LEFT_OUT_DETECT_LINE].value;
+          tracker_base_right_out_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_OUT_DETECT_LINE].value;
         } else {
           tracker_base_left_in_detect_line = (((mid_values_left - tracker_base_left_in_detect_line) / 4) * 3) + tracker_base_left_in_detect_line;
           tracker_base_right_in_detect_line = (((mid_values_right - tracker_base_right_in_detect_line) / 4) * 3) + tracker_base_right_in_detect_line;
@@ -285,7 +290,7 @@ void FuraE::main() {
         previous_step = current_step;
         current_step_init = false;
 
-        setMotorSpeed(F_E_ESC_MID_STOP, F_E_ESC_MID_STOP);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_ESC_MID_STOP].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_MID_STOP].value);
       }
       if (controller->getIRReceiver()->isDataReady()) {
         IRReceiver::ValueRC5Sumo value = controller->getIRReceiver()->getValueRC5Sumo();
@@ -333,7 +338,7 @@ void FuraE::main() {
         previous_step = current_step;
         current_step_init = false;
 
-        setMotorSpeed(F_E_ESC_MID_STOP, F_E_ESC_MID_STOP);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_ESC_MID_STOP].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_MID_STOP].value);
       }
 
       HAL_Delay(F_E_BUTTON_START_WAIT);
@@ -348,7 +353,7 @@ void FuraE::main() {
         previous_step = current_step;
         current_step_init = false;
 
-        setMotorSpeed(F_E_DEFENSE_BACK_SLOW, F_E_DEFENSE_BACK_FAST);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_DEFENSE_BACK_SLOW].value, (*config_motor)[(size_t)enum_motor::F_M_DEFENSE_BACK_FAST].value);
         sensor_gyro_in__time_tick_ini = 0;
         tracker_left_in__time_tick_ini = 0;
         tracker_right_in__time_tick_ini = 0;
@@ -360,7 +365,7 @@ void FuraE::main() {
 
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -370,7 +375,7 @@ void FuraE::main() {
       detectTrakerRightIn(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED);
       if (current_step != previous_step) break;
 
-      detectTimeOut(enum_step_fura::STEP_DEFENSE__STEP2_ATTACK, F_E_DEFENSE_LEFT_OUT_MS);
+      detectTimeOut(enum_step_fura::STEP_DEFENSE__STEP2_ATTACK, (*config_motor)[(size_t)enum_motor::F_M_DEFENSE_LEFT_OUT_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -379,7 +384,7 @@ void FuraE::main() {
         previous_step = current_step;
         current_step_init = false;
 
-        setMotorSpeed(F_E_DEFENSE_BACK_FAST, F_E_DEFENSE_BACK_SLOW);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_DEFENSE_BACK_FAST].value, (*config_motor)[(size_t)enum_motor::F_M_DEFENSE_BACK_SLOW].value);
         sensor_gyro_in__time_tick_ini = 0;
         tracker_left_in__time_tick_ini = 0;
         tracker_right_in__time_tick_ini = 0;
@@ -390,7 +395,7 @@ void FuraE::main() {
         time_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -400,7 +405,7 @@ void FuraE::main() {
       detectTrakerRightIn(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED);
       if (current_step != previous_step) break;
 
-      detectTimeOut(enum_step_fura::STEP_DEFENSE__STEP2_ATTACK, F_E_DEFENSE_RIGHT_OUT_MS);
+      detectTimeOut(enum_step_fura::STEP_DEFENSE__STEP2_ATTACK, (*config_motor)[(size_t)enum_motor::F_M_DEFENSE_RIGHT_OUT_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -409,7 +414,7 @@ void FuraE::main() {
         previous_step = current_step;
         current_step_init = false;
 
-        setMotorSpeed(F_E_DEFENSE_SPIN_FRONT, F_E_DEFENSE_SPIN_BACK);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_DEFENSE_SPIN_FRONT].value, (*config_motor)[(size_t)enum_motor::F_M_DEFENSE_SPIN_BACK].value);
         tracker_left_in__time_tick_ini = 0;
         tracker_right_in__time_tick_ini = 0;
         distance_left_in__time_tick_ini = 0;
@@ -419,7 +424,7 @@ void FuraE::main() {
         time_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -429,7 +434,7 @@ void FuraE::main() {
       detectTrakerRightIn(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED);
       if (current_step != previous_step) break;
 
-      detectTimeOut(enum_step_fura::STEP_DEFENSE__STEP2_ATTACK, F_E_DEFENSE_SPIN_OUT_MS);
+      detectTimeOut(enum_step_fura::STEP_DEFENSE__STEP2_ATTACK, (*config_motor)[(size_t)enum_motor::F_M_DEFENSE_SPIN_OUT_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -438,11 +443,11 @@ void FuraE::main() {
         previous_step = current_step;
         current_step_init = false;
 
-        setMotorSpeedRamp(F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_BOTH_SPEED_BOOST, F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_BOTH_SPEED_BOOST);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED_BOOST].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED_BOOST].value);
         distance_center_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS, F_E_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -452,7 +457,7 @@ void FuraE::main() {
       detectTrakerRightIn(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED);
       if (current_step != previous_step) break;
 
-      detectDistanceCenterOut(enum_step_fura::STEP_DISTANCE_BOTH_DETECTED, F_E_DEFENSE_ATTACK_OUT_MS);
+      detectDistanceCenterOut(enum_step_fura::STEP_DISTANCE_BOTH_DETECTED, (*config_motor)[(size_t)enum_motor::F_M_DEFENSE_ATTACK_OUT_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -460,7 +465,7 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeedRamp(F_E_ESC_BASE_SPEED_RAMP_INI, esc_speed_base_left, F_E_ESC_BASE_SPEED_RAMP_INI, esc_speed_base_right);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, esc_speed_base_left, (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, esc_speed_base_right);
         sensor_gyro_in__time_tick_ini = 0;
         tracker_left_in__time_tick_ini = 0;
         tracker_right_in__time_tick_ini = 0;
@@ -470,7 +475,7 @@ void FuraE::main() {
         time_out__time_tick_ini = 0;
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -492,14 +497,14 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeed(F_E_SENSOR_TILTING_BACK_FAST, F_E_SENSOR_TILTING_BACK_SLOW);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SENSOR_TILTING_BACK_FAST].value, (*config_motor)[(size_t)enum_motor::F_M_SENSOR_TILTING_BACK_SLOW].value);
         sensor_gyro_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
-      detectSensorTiltingOut(enum_step_fura::STEP_MOTOR_START, F_E_SENSOR_TILTING_OUT_MS);
+      detectSensorTiltingOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_SENSOR_TILTING_OUT_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -507,16 +512,16 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeed(F_E_ESC_TRAKER_BACK, F_E_ESC_TRAKER_BACK);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_BACK].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_BACK].value);
         tracker_left_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
       if (current_step != previous_step) break;
-      detectTrakerLeftOut(enum_step_fura::STEP_TRACKER_LEFT_DETECTED__STEP2_ROTATE, F_E_TRACKER_OUT_OF_LINE_MS);
+      detectTrakerLeftOut(enum_step_fura::STEP_TRACKER_LEFT_DETECTED__STEP2_ROTATE, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_MS].value);
       if (current_step != previous_step) break;
       detectTrakerRightIn(enum_step_fura::STEP_TRACKER_LEFT_DETECTED__STEP2_RIGHT_DETECTED);
       if (current_step != previous_step) break;
@@ -526,11 +531,11 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeedRamp(F_E_ESC_BASE_SPEED_RAMP_INI, F_E_ESC_TRAKER_ROTATE_FAST, F_E_ESC_TRAKER_ROTATE_SLOW, F_E_ESC_TRAKER_ROTATE_SLOW);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_FAST].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_SLOW].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_SLOW].value);
         time_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -539,7 +544,7 @@ void FuraE::main() {
       if (current_step != previous_step) break;
       detectTrakerRightIn(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED);
       if (current_step != previous_step) break;
-      detectTimeOut(STEP_MOTOR_START, F_E_TRACKER_ROTATE_MS);
+      detectTimeOut(STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_ROTATE_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -547,19 +552,19 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeed(F_E_ESC_TRACKER_BOTH_SPEED_FAST, F_E_ESC_TRACKER_BOTH_SPEED_SLOW);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_FAST].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_SLOW].value);
         tracker_left_out__time_tick_ini = HAL_GetTick();
         tracker_right_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
       if (current_step != previous_step) break;
-      detectTrakerRightOut(enum_step_fura::STEP_MOTOR_START, F_E_TRACKER_OUT_OF_LINE_BOTH_MS);
+      detectTrakerRightOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
-      detectTrakerLeftOut(enum_step_fura::STEP_MOTOR_START, F_E_TRACKER_OUT_OF_LINE_BOTH_MS);
+      detectTrakerLeftOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -567,16 +572,16 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeed(F_E_ESC_TRAKER_BACK, F_E_ESC_TRAKER_BACK);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_BACK].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_BACK].value);
         tracker_right_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
       if (current_step != previous_step) break;
-      detectTrakerRightOut(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED__STEP2_ROTATE, F_E_TRACKER_OUT_OF_LINE_MS);
+      detectTrakerRightOut(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED__STEP2_ROTATE, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_MS].value);
       if (current_step != previous_step) break;
       detectTrakerLeftIn(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED__STEP2_LEFT_DETECTED);
       if (current_step != previous_step) break;
@@ -586,12 +591,12 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeedRamp(F_E_ESC_TRAKER_ROTATE_SLOW, F_E_ESC_TRAKER_ROTATE_SLOW, F_E_ESC_BASE_SPEED_RAMP_INI, F_E_ESC_TRAKER_ROTATE_FAST);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_SLOW].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_SLOW].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_FAST].value);
         tracker_right_out__time_tick_ini = HAL_GetTick();
         time_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -600,7 +605,7 @@ void FuraE::main() {
       if (current_step != previous_step) break;
       detectTrakerLeftIn(enum_step_fura::STEP_TRACKER_LEFT_DETECTED);
       if (current_step != previous_step) break;
-      detectTimeOut(STEP_MOTOR_START, F_E_TRACKER_ROTATE_MS);
+      detectTimeOut(STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_ROTATE_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -608,19 +613,19 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeed(F_E_ESC_TRACKER_BOTH_SPEED_SLOW, F_E_ESC_TRACKER_BOTH_SPEED_FAST);
+        setMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_SLOW].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_FAST].value);
         tracker_left_out__time_tick_ini = HAL_GetTick();
         tracker_right_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
       if (current_step != previous_step) break;
-      detectTrakerLeftOut(enum_step_fura::STEP_MOTOR_START, F_E_TRACKER_OUT_OF_LINE_BOTH_MS);
+      detectTrakerLeftOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
-      detectTrakerRightOut(enum_step_fura::STEP_MOTOR_START, F_E_TRACKER_OUT_OF_LINE_BOTH_MS);
+      detectTrakerRightOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -628,11 +633,11 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeedRamp(F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_SPEED_SLOW_LEFT, F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_SPEED_RIGHT);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_LEFT].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_SPEED_RIGHT].value);
         distance_left_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -644,7 +649,7 @@ void FuraE::main() {
 
       detectDistanceCenterIn(enum_step_fura::STEP_DISTANCE_CENTER_BOOST);
       if (current_step != previous_step) break;
-      detectDistanceLeftOut(enum_step_fura::STEP_MOTOR_START, F_E_DISTANCE_OUT_MS);
+      detectDistanceLeftOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_OUT_MS].value);
       if (current_step != previous_step) {
         detectDistanceRightIn(enum_step_fura::STEP_DISTANCE_RIGHT_DETECTED);
         break;
@@ -657,11 +662,11 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeedRamp(F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_SPEED_LEFT, F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_SPEED_SLOW_RIGHT);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_SPEED_LEFT].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_RIGHT].value);
         distance_right_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -673,7 +678,7 @@ void FuraE::main() {
 
       detectDistanceCenterIn(enum_step_fura::STEP_DISTANCE_CENTER_BOOST);
       if (current_step != previous_step) break;
-      detectDistanceRightOut(enum_step_fura::STEP_MOTOR_START, F_E_DISTANCE_OUT_MS);
+      detectDistanceRightOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_OUT_MS].value);
       if (current_step != previous_step) {
         detectDistanceLeftIn(enum_step_fura::STEP_DISTANCE_LEFT_DETECTED);
         break;
@@ -687,12 +692,12 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeedRamp(F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_BOTH_SPEED, F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_BOTH_SPEED);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED].value);
         distance_left_out__time_tick_ini = HAL_GetTick();
         distance_right_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -704,9 +709,9 @@ void FuraE::main() {
 
       detectDistanceCenterIn(enum_step_fura::STEP_DISTANCE_CENTER_BOOST);
       if (current_step != previous_step) break;
-      detectDistanceLeftOut(enum_step_fura::STEP_DISTANCE_RIGHT_DETECTED, F_E_DISTANCE_BOTH_OUT_MS);
+      detectDistanceLeftOut(enum_step_fura::STEP_DISTANCE_RIGHT_DETECTED, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_OUT_MS].value);
       if (current_step != previous_step) break;
-      detectDistanceRightOut(enum_step_fura::STEP_DISTANCE_LEFT_DETECTED, F_E_DISTANCE_BOTH_OUT_MS);
+      detectDistanceRightOut(enum_step_fura::STEP_DISTANCE_LEFT_DETECTED, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_OUT_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -714,11 +719,11 @@ void FuraE::main() {
       if (current_step_init) {
         previous_step = current_step;
         current_step_init = false;
-        setMotorSpeedRamp(F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_BOTH_SPEED_BOOST, F_E_ESC_BASE_SPEED_RAMP_INI, F_E_DISTANCE_BOTH_SPEED_BOOST);
+        setMotorSpeedRamp((*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED_BOOST].value, (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI].value, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED_BOOST].value);
         distance_center_out__time_tick_ini = HAL_GetTick();
       }
 
-      rampMotorSpeed(F_E_SPEED_RAMP_TIME_INCREMENT_MS, F_E_SPEED_RAMP_VALUE_INCREMENT);
+      rampMotorSpeed((*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS].value, (*config_motor)[(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT].value);
       detectButtonStop();
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
@@ -728,7 +733,7 @@ void FuraE::main() {
       detectTrakerRightIn(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED);
       if (current_step != previous_step) break;
 
-      detectDistanceCenterOut(enum_step_fura::STEP_DISTANCE_BOTH_DETECTED, F_E_DISTANCE_BOTH_BOOST_OUT_MS);
+      detectDistanceCenterOut(enum_step_fura::STEP_DISTANCE_BOTH_DETECTED, (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_BOTH_BOOST_OUT_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -820,7 +825,7 @@ void FuraE::detectSensorGyroUp(enum_step_fura next_step) {
     } else {
       // Esperamos a que termine 1ms para saber que el tracker se ha detectado y no hay rebotes
       sensor_gyro_in__time_tick_current = HAL_GetTick() - sensor_gyro_in__time_tick_ini;
-      if (sensor_gyro_in__time_tick_current >= F_E_SENSOR_TILTING_IN_MS) {
+      if (sensor_gyro_in__time_tick_current >= (*config_motor)[(size_t)enum_motor::F_M_SENSOR_TILTING_IN_MS].value) {
         // Oponente detectado descartando rebotes
         sensor_gyro_in__time_tick_ini = 0;
         goNextStep(next_step);
@@ -1055,7 +1060,7 @@ void FuraE::detectDistanceLeftIn(enum_step_fura next_step) {
     } else {
       // Esperamos a que termine 1ms para saber que el tracker se ha detectado y no hay rebotes
       distance_left_in__time_tick_current = HAL_GetTick() - distance_left_in__time_tick_ini;
-      if (distance_left_in__time_tick_current >= F_E_DISTANCE_IN_MS) {
+      if (distance_left_in__time_tick_current >= (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_IN_MS].value) {
         // Oponente detectado descartando rebotes
         distance_left_in__time_tick_ini = 0;
         goNextStep(next_step);
@@ -1130,7 +1135,7 @@ void FuraE::detectDistanceRightIn(enum_step_fura next_step) {
     } else {
       // Esperamos a que termine 1ms para saber que el tracker se ha detectado y no hay rebotes
       distance_right_in__time_tick_current = HAL_GetTick() - distance_right_in__time_tick_ini;
-      if (distance_right_in__time_tick_current >= F_E_DISTANCE_IN_MS) {
+      if (distance_right_in__time_tick_current >= (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_IN_MS].value) {
         // Oponente detectado descartando rebotes
         distance_right_in__time_tick_ini = 0;
         goNextStep(next_step);
@@ -1206,7 +1211,7 @@ void FuraE::detectDistanceCenterIn(enum_step_fura next_step) {
     } else {
       // Esperamos a que termine 1ms para saber que el tracker se ha detectado y no hay rebotes
       distance_center_in__time_tick_current = HAL_GetTick() - distance_center_in__time_tick_ini;
-      if (distance_center_in__time_tick_current >= F_E_DISTANCE_CENTER_BOOST_MS) {
+      if (distance_center_in__time_tick_current >= (*config_motor)[(size_t)enum_motor::F_M_DISTANCE_CENTER_BOOST_MS].value) {
         // Oponente detectado descartando rebotes
         distance_center_in__time_tick_ini = 0;
         goNextStep(next_step);
@@ -1342,7 +1347,7 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
       speed_refresh__time_tick_ini = HAL_GetTick();
     } else {
       speed_refresh__time_tick_current = HAL_GetTick() - speed_refresh__time_tick_ini;
-      if (speed_refresh__time_tick_current >= F_E_SPEED_REFRESH_MS) {
+      if (speed_refresh__time_tick_current >= (*config_motor)[(size_t)enum_motor::F_M_SPEED_REFRESH_MS].value) {
         controller->getMotorLeft()->setSpeed(speed_left_ini);
         controller->getMotorRight()->setSpeed(speed_right_ini);
         speed_refresh__time_tick_ini = 0;
@@ -1354,22 +1359,22 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
 void FuraE::setDirectionCenter() {
   if (direction_base != enum_direction::DIR_CENTER) {
     direction_base = enum_direction::DIR_CENTER;
-    esc_speed_base_left = F_E_ESC_BASE_SPEED_LEFT;
-    esc_speed_base_right = F_E_ESC_BASE_SPEED_RIGHT;
+    esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_LEFT].value;
+    esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RIGHT].value;
   }
 }
 void FuraE::setDirectionLeft() {
   if (direction_base != enum_direction::DIR_LEFT) {
     direction_base = enum_direction::DIR_LEFT;
-    esc_speed_base_left = F_E_ESC_BASE_SLOW;
-    esc_speed_base_right = F_E_ESC_BASE_FAST;
+    esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SLOW].value;
+    esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_FAST].value;
   }
 }
 void FuraE::setDirectionRight() {
   if (direction_base != enum_direction::DIR_RIGHT) {
     direction_base = enum_direction::DIR_RIGHT;
-    esc_speed_base_left = F_E_ESC_BASE_FAST;
-    esc_speed_base_right = F_E_ESC_BASE_SLOW;
+    esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_FAST].value;
+    esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SLOW].value;
   }
 }
 
