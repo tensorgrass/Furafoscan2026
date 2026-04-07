@@ -19,8 +19,8 @@ void FuraC::main() {
             step_wait_button_start_pressed__button_previous_state = 1;
             current_step = enum_step_fura::STEP_BUTTON_START_PRESSED;
             step_button_start_pressed__time_tick_ini = HAL_GetTick(); // Guarda el tiempo actual
-            controller->getMotorLeft()->setSpeed(ESC_MID_STOP);
-            controller->getMotorRight()->setSpeed(ESC_MID_STOP);
+            controller->getMotorOneshot125Left()->setSpeed(ESC_MID_STOP);
+            controller->getMotorOneshot125Right()->setSpeed(ESC_MID_STOP);
           }
           else {
             //Aun esta pulsado el boton del estado anterior, se tiene que esperar a que lo suelte
@@ -55,8 +55,8 @@ void FuraC::main() {
             controller->getLedStart()->turn_on();
             current_step = enum_step_fura::STEP_MOTOR_START;
             step_motor_start__button_previous_state = 1;
-            controller->getMotorLeft()->setSpeed(ESC_TEST_SPEED);
-            controller->getMotorRight()->setSpeed(ESC_TEST_SPEED);
+            controller->getMotorOneshot125Left()->setSpeed(ESC_TEST_SPEED);
+            controller->getMotorOneshot125Right()->setSpeed(ESC_TEST_SPEED);
           }
           else {
             //Ya hemos llegado a los 5 segundos y no hace falta volver a encender el led
@@ -67,8 +67,8 @@ void FuraC::main() {
         //Se ha dejado de pulsar el boton antes de tiempo, restauramos valores iniciales
         current_step = enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED;
         step_wait_button_start_pressed__button_previous_state = 0;
-        controller->getMotorLeft()->disable();
-        controller->getMotorRight()->disable();
+        controller->getMotorOneshot125Left()->disable();
+        controller->getMotorOneshot125Right()->disable();
       }
       break;
     case enum_step_fura::STEP_MOTOR_START:
@@ -79,8 +79,8 @@ void FuraC::main() {
           //en el caso que se haya soltado, y se vuelva a pulsar, se tiene que parar todo y volver al estado inicial
           if (step_motor_start__button_previous_state == 0) {
             //Se ha pulsado el boton y se tiene que parar todo
-            controller->getMotorLeft()->disable();
-            controller->getMotorRight()->disable();
+            controller->getMotorOneshot125Left()->disable();
+            controller->getMotorOneshot125Right()->disable();
             current_step = enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED;
             step_wait_button_start_pressed__button_previous_state = 1;
           }

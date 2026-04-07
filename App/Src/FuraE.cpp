@@ -4,7 +4,7 @@ FuraE::FuraE(ControllerBase* controllerBaseValue) : controller(controllerBaseVal
   // Constructor de FuraE, inicializa el controlador y los objetos UART
   current_step = enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED;
   current_step_init = true;
-  direction_base = enum_direction::DIR_CENTER;
+  direction_base = enum_direction::DIR_NONE;
 
   uint32_t rx_data[FLASH_DATA_NUM_VALUES];
   controller->getFlashMemory()->read(rx_data, FLASH_DATA_NUM_VALUES);
@@ -14,13 +14,21 @@ FuraE::FuraE(ControllerBase* controllerBaseValue) : controller(controllerBaseVal
     tracker_base_left_out_detect_line = rx_data[3];
     tracker_base_right_out_detect_line = rx_data[4];
     rc_address = rx_data[5];
+    furafoscan_type = rx_data[6];
   }
 
-  if (furafosca_type == 1) {
-    config_motor = &Configs::Furafoscan1;
-  } else {
-    config_motor = &Configs::Furafoscan2;
+//  furafoscan_type = enum_type_fura::T_FURAFOSCAN1;
+//  furafoscan_type = enum_type_fura::T_FURAFOSCAN2;
+
+  switch ((enum_type_fura)furafoscan_type) {
+    case enum_type_fura::T_FURAFOSCAN1:
+      config_motor = &Configs::Furafoscan1;
+      break;
+    case enum_type_fura::T_FURAFOSCAN2:
+      config_motor = &Configs::Furafoscan2;
+      break;
   }
+
 }
 
 // prueba boton 5 segundos para arrancar y arrancar el motor
@@ -71,21 +79,21 @@ void FuraE::main() {
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             step_after_button = enum_step_fura::STEP_DEFENSE_LEFT;
-            goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
+            goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
             break;
 
           case F_E_IR_NEC_RIGHT:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             step_after_button = enum_step_fura::STEP_DEFENSE_RIGHT;
-            goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
+            goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
             break;
 
           case F_E_IR_NEC_BACK:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             step_after_button = enum_step_fura::STEP_DEFENSE_SPIN;
-            goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
+            goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
             break;
 
           case F_E_IR_NEC_MOUSE:  // configurar los limites de los tracker en la pista real
@@ -225,10 +233,10 @@ void FuraE::main() {
         uint32_t mid_values_left = sum_values_left / tracker_base_iteration;
         uint32_t mid_values_right = sum_values_right / tracker_base_iteration;
         if (mid_values_left < (tracker_base_left_in_detect_line + 500) || mid_values_right < (tracker_base_right_in_detect_line + 500)) {
-          tracker_base_left_in_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_LEFT_IN_DETECT_LINE].value;
-          tracker_base_right_in_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE].value;
-          tracker_base_left_out_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_LEFT_OUT_DETECT_LINE].value;
-          tracker_base_right_out_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_OUT_DETECT_LINE].value;
+          tracker_base_left_in_detect_line = F_E_TRACKER_LEFT_IN_DETECT_LINE;
+          tracker_base_right_in_detect_line = F_E_TRACKER_RIGHT_IN_DETECT_LINE;
+          tracker_base_left_out_detect_line = F_E_TRACKER_LEFT_OUT_DETECT_LINE;
+          tracker_base_right_out_detect_line = F_E_TRACKER_RIGHT_OUT_DETECT_LINE;
         } else {
           tracker_base_left_in_detect_line = (((mid_values_left - tracker_base_left_in_detect_line) / 4) * 3) + tracker_base_left_in_detect_line;
           tracker_base_right_in_detect_line = (((mid_values_right - tracker_base_right_in_detect_line) / 4) * 3) + tracker_base_right_in_detect_line;
@@ -240,7 +248,8 @@ void FuraE::main() {
                        tracker_base_right_in_detect_line,
                        tracker_base_left_out_detect_line,
                        tracker_base_right_out_detect_line,
-                       rc_address);
+                       rc_address,
+                       furafoscan_type);
 
         tracker_base_left_values.clear();
         tracker_base_right_values.clear();
@@ -306,7 +315,7 @@ void FuraE::main() {
 
             }
             else if (address == rc_address) { //stop
-              rc_num_error2=rc_num_error2;
+              rc_num_error2=rc_num_error2; //No hace nada
             }
             else {
               rc_num_error2++;
@@ -318,7 +327,8 @@ void FuraE::main() {
                            tracker_base_right_in_detect_line,
                            tracker_base_left_out_detect_line,
                            tracker_base_right_out_detect_line,
-                           rc_address);
+                           rc_address,
+                           furafoscan_type);
             break;
           default:
             rc_num_error1++;
@@ -562,9 +572,9 @@ void FuraE::main() {
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
       if (current_step != previous_step) break;
-      detectTrakerRightOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
+      detectTrakerRightOut(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED__STEP2_ROTATE, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
-      detectTrakerLeftOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
+      detectTrakerLeftOut(enum_step_fura::STEP_TRACKER_LEFT_DETECTED__STEP2_ROTATE, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -623,9 +633,9 @@ void FuraE::main() {
       if (current_step != previous_step) break;
       detectSensorGyroUp(enum_step_fura::STEP_SENSOR_TILTING_DETECTED);
       if (current_step != previous_step) break;
-      detectTrakerLeftOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
+      detectTrakerLeftOut(enum_step_fura::STEP_TRACKER_LEFT_DETECTED__STEP2_ROTATE, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
-      detectTrakerRightOut(enum_step_fura::STEP_MOTOR_START, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
+      detectTrakerRightOut(enum_step_fura::STEP_TRACKER_RIGHT_DETECTED__STEP2_ROTATE, (*config_motor)[(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS].value);
       if (current_step != previous_step) break;
       break;
 
@@ -757,8 +767,16 @@ void FuraE::detectButtonStop() {
       // parar todo y volver al estado inicial
       if (button_stop__button_previous_state == 0) {
         // Se ha pulsado el boton y se tiene que parar todo
-        controller->getMotorLeft()->disable();
-        controller->getMotorRight()->disable();
+        switch ((enum_type_fura)furafoscan_type) {
+          case enum_type_fura::T_FURAFOSCAN1:
+            controller->getMotorOneshot125Left()->disable();
+            controller->getMotorOneshot125Right()->disable();
+            break;
+          case enum_type_fura::T_FURAFOSCAN2:
+            controller->getMotorPWMLeft()->disable();
+            controller->getMotorPWMRight()->disable();
+            break;
+        }
         button_stop__button_previous_state = 1;
         goNextStep(enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED);
         return;
@@ -773,9 +791,17 @@ void FuraE::detectButtonStop() {
     IRReceiver::ValueRC5Sumo value = controller->getIRReceiver()->getValueRC5Sumo();
     uint32_t command = value.command;
     uint32_t address = value.address;
-    if (command == F_E_IR_RC5SUMO_COMMAND_PROGRAM && address == rc_address) { //stop
-      controller->getMotorLeft()->disable();
-      controller->getMotorRight()->disable();
+    if (command == F_E_IR_RC5SUMO_COMMAND_START_STOP && address == rc_address) { //stop
+      switch ((enum_type_fura)furafoscan_type) {
+        case enum_type_fura::T_FURAFOSCAN1:
+          controller->getMotorOneshot125Left()->disable();
+          controller->getMotorOneshot125Right()->disable();
+          break;
+        case enum_type_fura::T_FURAFOSCAN2:
+          controller->getMotorPWMLeft()->disable();
+          controller->getMotorPWMRight()->disable();
+          break;
+      }
       button_stop__button_previous_state = 1;
       goNextStep(enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED);
       return;
@@ -814,7 +840,7 @@ void FuraE::detectSensorGyroUp(enum_step_fura next_step) {
 #ifdef F_E_ACTIVE_SENSOR_TILTING
   controller->getSensorGyro()->read_values();
   sensor_gyro_in__y_value = controller->getSensorGyro()->get_accel_y();
-  if (sensor_gyro_in__y_value < F_E_GYRO_Y_UP){
+  if (!(sensor_gyro_in__y_value > F_E_GYRO_Y_UP_PRE && sensor_gyro_in__y_value < F_E_GYRO_Y_UP_POST)){
     // Se ha empezado a detectar al oponente
     #ifdef F_E_ACTIVE_LED_SENSOR_TILTING
     if (controller->getLedDistanceCenter()->get_status() == 0) controller->getLedDistanceCenter()->turn_on();
@@ -850,7 +876,9 @@ void FuraE::detectSensorGyroUp(enum_step_fura next_step) {
 
 void FuraE::detectSensorTiltingOut(enum_step_fura next_step, uint32_t time_out_detect) {
 #ifdef F_E_ACTIVE_DISTANCE_SENSOR_CENTER
-  if (!controller->getSensorTilting()->isButtonPressed()) {
+  controller->getSensorGyro()->read_values();
+  sensor_gyro_in__y_value = controller->getSensorGyro()->get_accel_y();
+  if (sensor_gyro_in__y_value > F_E_GYRO_Y_UP_PRE && sensor_gyro_in__y_value < F_E_GYRO_Y_UP_POST){
     #ifdef F_E_ACTIVE_LED_SENSOR_TILTING
     if (controller->getLedDistanceCenter()->get_status() == 1) controller->getLedDistanceCenter()->turn_off();
     #endif
@@ -1146,7 +1174,7 @@ void FuraE::detectDistanceRightIn(enum_step_fura next_step) {
     }
   } else {
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_RIGHT
-    if (controller->getLedDistanceRight()->get_status() == 1) controller->getLedDistanceRight()->turn_off();
+      if (controller->getLedDistanceRight()->get_status() == 1) controller->getLedDistanceRight()->turn_off();
     #endif
     if (distance_right_in__time_tick_ini != 0) {
       // Detectado rebote
@@ -1165,7 +1193,7 @@ void FuraE::detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_d
   if (distance_right_out__distance_value > F_E_TOF_DISTANCE_MAX) {
     // Se ha dejado de detectar al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_RIGHT
-    if (controller->getLedDistanceRight()->get_status() == 1) controller->getLedDistanceRight()->turn_off();
+      if (controller->getLedDistanceRight()->get_status() == 1) controller->getLedDistanceRight()->turn_off();
     #endif
     if (distance_right_out__time_tick_ini == 0) {
       // Se ha dejado de detectar al oponente por primera vez, tiene que esperar un tiempo prudencial para que no sea un falso positivo
@@ -1185,7 +1213,7 @@ void FuraE::detectDistanceRightOut(enum_step_fura next_step, uint32_t time_out_d
   } else {
     // Aun estamos detectando al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_RIGHT
-    if (controller->getLedDistanceRight()->get_status() == 0) controller->getLedDistanceRight()->turn_on();
+      if (controller->getLedDistanceRight()->get_status() == 0) controller->getLedDistanceRight()->turn_on();
     #endif
     if (distance_right_out__time_tick_ini == 0) {
       // Espera a dejar de detectar al oponente
@@ -1203,7 +1231,7 @@ void FuraE::detectDistanceCenterIn(enum_step_fura next_step) {
   if (distance_center_in__distance_value < F_E_TOF_DISTANCE_MAX) {
 // Se ha empezado a detectar al oponente
     #ifdef F_E_ACTIVE_LED_DISTANCE_SENSOR_CENTER
-    if (controller->getLedDistanceCenter()->get_status() == 0) controller->getLedDistanceCenter()->turn_on();
+      if (controller->getLedDistanceCenter()->get_status() == 0) controller->getLedDistanceCenter()->turn_on();
     #endif
     if (distance_center_in__time_tick_ini == 0) {
       // Empezamos a contar el tiempo del sensor de distancia esta activo
@@ -1272,8 +1300,16 @@ void FuraE::detectDistanceCenterOut(enum_step_fura next_step, uint32_t time_out_
 }
 
 void FuraE::setMotorSpeed(uint32_t speed_left_value, uint32_t speed_right_value) {
-  controller->getMotorLeft()->setSpeed(speed_left_value);
-  controller->getMotorRight()->setSpeed(speed_right_value);
+  switch ((enum_type_fura)furafoscan_type) {
+    case enum_type_fura::T_FURAFOSCAN1:
+      controller->getMotorOneshot125Left()->setSpeed(speed_left_value);
+      controller->getMotorOneshot125Right()->setSpeed(speed_right_value);
+      break;
+    case enum_type_fura::T_FURAFOSCAN2:
+      controller->getMotorPWMLeft()->setSpeed(speed_left_value);
+      controller->getMotorPWMRight()->setSpeed(speed_right_value);
+      break;
+  }
   speed_left_ini = speed_left_value;
   speed_left_end = speed_left_value;
   speed_right_ini = speed_right_value;
@@ -1305,8 +1341,16 @@ void FuraE::setMotorSpeedRamp(uint32_t speed_left_ini_value, uint32_t speed_left
   }
   speed_right_end = speed_right_end_value;
 
-  controller->getMotorLeft()->setSpeed(speed_left_ini);
-  controller->getMotorRight()->setSpeed(speed_right_ini);
+  switch ((enum_type_fura)furafoscan_type) {
+    case enum_type_fura::T_FURAFOSCAN1:
+      controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
+      controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
+      break;
+    case enum_type_fura::T_FURAFOSCAN2:
+      controller->getMotorPWMLeft()->setSpeed(speed_left_ini);
+      controller->getMotorPWMRight()->setSpeed(speed_right_ini);
+      break;
+  }
   speed_ramp__time_tick_ini = 0;
   speed_refresh__time_tick_ini = 0;
 }
@@ -1325,14 +1369,28 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
           if (speed_left_ini > speed_left_end) {
             speed_left_ini = speed_left_end;
           }
-          controller->getMotorLeft()->setSpeed(speed_left_ini);
+          switch ((enum_type_fura)furafoscan_type) {
+            case enum_type_fura::T_FURAFOSCAN1:
+              controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
+              break;
+            case enum_type_fura::T_FURAFOSCAN2:
+              controller->getMotorPWMLeft()->setSpeed(speed_left_ini);
+              break;
+          }
         }
         if (speed_right_ini != speed_right_end) {
           speed_right_ini += speed_ramp_value_increment;
           if (speed_right_ini > speed_right_end) {
             speed_right_ini = speed_right_end;
           }
-          controller->getMotorRight()->setSpeed(speed_right_ini);
+          switch ((enum_type_fura)furafoscan_type) {
+            case enum_type_fura::T_FURAFOSCAN1:
+              controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
+              break;
+            case enum_type_fura::T_FURAFOSCAN2:
+              controller->getMotorPWMRight()->setSpeed(speed_right_ini);
+              break;
+          }
         }
         speed_ramp__time_tick_ini = HAL_GetTick();
         speed_refresh__time_tick_ini = 0;
@@ -1348,8 +1406,16 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
     } else {
       speed_refresh__time_tick_current = HAL_GetTick() - speed_refresh__time_tick_ini;
       if (speed_refresh__time_tick_current >= (*config_motor)[(size_t)enum_motor::F_M_SPEED_REFRESH_MS].value) {
-        controller->getMotorLeft()->setSpeed(speed_left_ini);
-        controller->getMotorRight()->setSpeed(speed_right_ini);
+        switch ((enum_type_fura)furafoscan_type) {
+          case enum_type_fura::T_FURAFOSCAN1:
+            controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
+            controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
+            break;
+          case enum_type_fura::T_FURAFOSCAN2:
+            controller->getMotorPWMLeft()->setSpeed(speed_left_ini);
+            controller->getMotorPWMRight()->setSpeed(speed_right_ini);
+            break;
+        }
         speed_refresh__time_tick_ini = 0;
       }
     }
@@ -1382,7 +1448,8 @@ void FuraE::writeDataFlash(uint32_t tracker_base_left_in_detect_line_value,
                            uint32_t tracker_base_right_in_detect_line_value,
                            uint32_t tracker_base_left_out_detect_line_value,
                            uint32_t tracker_base_right_out_detect_line_value,
-                           uint32_t rc_address_value) {
+                           uint32_t rc_address_value,
+                           uint32_t furafoscan_type_value) {
   uint32_t rx_data[FLASH_DATA_NUM_VALUES];
   rx_data[0] = FLASH_DATA_VERSION;
   rx_data[1] = tracker_base_left_in_detect_line_value;
@@ -1390,5 +1457,6 @@ void FuraE::writeDataFlash(uint32_t tracker_base_left_in_detect_line_value,
   rx_data[3] = tracker_base_left_out_detect_line_value;
   rx_data[4] = tracker_base_right_out_detect_line_value;
   rx_data[5] = rc_address_value;
+  rx_data[6] = furafoscan_type_value;
   controller->getFlashMemory()->write(rx_data, FLASH_DATA_NUM_VALUES);
 }

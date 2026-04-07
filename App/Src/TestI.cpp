@@ -475,7 +475,7 @@ void TestI::sendMotorEncoderTrackerLeft() {
       }
 
       if (motor_left_value != motor_left_before) {
-        controller->getMotorLeft()->setSpeed(motor_left_value);
+        controller->getMotorOneshot125Left()->setSpeed(motor_left_value);
         motor_left_before = motor_left_value;
       }
       controller->getUartSerial()->buffer(std::to_string(motor_left_value));
@@ -598,7 +598,7 @@ void TestI::sendMotorEncoderTrackerRight() {
       }
 
       if (motor_right_value != motor_right_before) {
-        controller->getMotorRight()->setSpeed(motor_right_value);
+        controller->getMotorOneshot125Right()->setSpeed(motor_right_value);
         motor_right_before = motor_right_value;
       }
       controller->getUartSerial()->buffer(std::to_string(motor_left_value));
@@ -717,7 +717,7 @@ void TestI::sendMotorEncoderDistanceLeft() {
       }
 
       if (motor_right_value != motor_right_before) {
-        controller->getMotorRight()->setSpeed(motor_right_value);
+        controller->getMotorOneshot125Right()->setSpeed(motor_right_value);
         motor_right_before = motor_right_value;
       }
       controller->getUartSerial()->buffer(std::to_string(motor_left_value));
@@ -841,7 +841,7 @@ void TestI::sendMotorEncoderDistanceRight() {
       }
 
       if (motor_left_value != motor_left_before) {
-        controller->getMotorLeft()->setSpeed(motor_left_value);
+        controller->getMotorOneshot125Left()->setSpeed(motor_left_value);
         motor_left_before = motor_left_value;
       }
       controller->getUartSerial()->buffer(std::to_string(motor_left_value));

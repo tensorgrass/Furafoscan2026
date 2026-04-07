@@ -18,6 +18,7 @@
 #include <IRReceiver.hpp>
 #include <LedBase.hpp>
 #include <MotorOneShot125.hpp>
+#include <MotorPWM.hpp>
 #include <TestA.hpp>
 #include <TestBase.hpp>
 #include <TestC.hpp>
@@ -44,7 +45,8 @@ FuraE fura_run(&controller);
 volatile int message_counter = 0;
 
 extern "C" void main_fura_mode(TIM_HandleTypeDef *htim2,
-		                       TIM_HandleTypeDef *htim4,
+                               TIM_HandleTypeDef *htim3,
+		                           TIM_HandleTypeDef *htim4,
                                ADC_HandleTypeDef *hadc1,
 							   I2C_HandleTypeDef *hi2c1,
 							   uint16_t *adc_values_value,
@@ -71,8 +73,11 @@ extern "C" void main_fura_mode(TIM_HandleTypeDef *htim2,
   distance_tof_right.init(TOF_ADDR_RIGHT);
   distance_tof_center.init(TOF_ADDR_CENTER);
 
-  MotorOneShot125 motor_left(htim4, TIM_CHANNEL_2, &(htim4->Instance->CCR2));
-  MotorOneShot125 motor_right(htim4, TIM_CHANNEL_1, &(htim4->Instance->CCR1));
+  MotorOneShot125 motor_oneshot125_left(htim4, TIM_CHANNEL_2, &(htim4->Instance->CCR2));
+  MotorOneShot125 motor_oneshot125_right(htim4, TIM_CHANNEL_1, &(htim4->Instance->CCR1));
+
+  MotorPWM motor_pwm_left(htim3, TIM_CHANNEL_2, &(htim3->Instance->CCR2));
+  MotorPWM motor_pwm_right(htim3, TIM_CHANNEL_1, &(htim3->Instance->CCR1));
 
   bool reverse = true;
   ButtonPullup button_start(GPIOB, GPIO_PIN_13, reverse);
@@ -89,7 +94,8 @@ extern "C" void main_fura_mode(TIM_HandleTypeDef *htim2,
 							 &distance_tof_left,
 							 &distance_tof_right,
 							 &distance_tof_center,
-							 &motor_left, &motor_right,
+							 &motor_oneshot125_left, &motor_oneshot125_right,
+							 &motor_pwm_left, &motor_pwm_right,
 							 &button_start, &ir_receiver, &led_start,
 							 &sensor_gyro,
 							 &flash_memory);

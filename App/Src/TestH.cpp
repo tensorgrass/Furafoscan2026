@@ -46,7 +46,7 @@ void TestH::sendMotorLeft() {
       controller->commSendData();
 
       motor_value = ESC_MID;
-      controller->getMotorLeft()->setSpeed(motor_value);
+      controller->getMotorOneshot125Left()->setSpeed(motor_value);
       uartSerial->bufferln(std::to_string(motor_value));
 
       HAL_Delay(3000); // Espera 100 milisegundos
@@ -76,11 +76,11 @@ void TestH::sendMotorLeft() {
 //            motor_value = ESC_FORWARD;
             motor_value = ESC_MID;
             uartSerial->bufferln(std::to_string(motor_value));
-            controller->getMotorLeft()->setSpeed(motor_value);
+            controller->getMotorOneshot125Left()->setSpeed(motor_value);
             break;
           }
         }
-        controller->getMotorLeft()->setSpeed(motor_value);
+        controller->getMotorOneshot125Left()->setSpeed(motor_value);
         uartSerial->bufferln(std::to_string(motor_value));
 
         HAL_Delay(500); // Espera 100 milisegundos
@@ -116,7 +116,7 @@ void TestH::sendMotorRight() {
       controller->commSendData();
 
       motor_value = ESC_MID;
-      controller->getMotorRight()->setSpeed(motor_value);
+      controller->getMotorOneshot125Right()->setSpeed(motor_value);
       uartSerial->bufferln(std::to_string(motor_value));
 
       HAL_Delay(3000); // Espera 100 milisegundos
@@ -146,11 +146,11 @@ void TestH::sendMotorRight() {
 //            motor_value = ESC_FORWARD;
             motor_value = ESC_MID;
             uartSerial->bufferln(std::to_string(motor_value));
-            controller->getMotorRight()->setSpeed(motor_value);
+            controller->getMotorOneshot125Right()->setSpeed(motor_value);
             break;
           }
         }
-        controller->getMotorRight()->setSpeed(motor_value);
+        controller->getMotorOneshot125Right()->setSpeed(motor_value);
         uartSerial->bufferln(std::to_string(motor_value));
 
         HAL_Delay(500); // Espera 100 milisegundos
@@ -180,7 +180,7 @@ void TestH::sendMotorEncoderLeft() {
       controller->setRxStep(enum_step::STEP_WAIT_ACCELERATE);
 
       motor_value = ESC_MID;
-      controller->getMotorLeft()->setSpeed(motor_value);
+      controller->getMotorOneshot125Left()->setSpeed(motor_value);
       uartSerial->bufferln(std::to_string(motor_value));
 
       HAL_Delay(3000); // Espera 100 milisegundos
@@ -208,7 +208,7 @@ void TestH::sendMotorEncoderLeft() {
           break;
         }
 
-        controller->getMotorLeft()->setSpeed(motor_value);
+        controller->getMotorOneshot125Left()->setSpeed(motor_value);
         uartSerial->bufferln(std::to_string(motor_value));
 
         HAL_Delay(100); // Espera 100 milisegundos
@@ -231,7 +231,7 @@ void TestH::sendMotorEncoderLeft() {
           motor_value = ESC_MID;
         }
 
-        controller->getMotorLeft()->setSpeed(motor_value);
+        controller->getMotorOneshot125Left()->setSpeed(motor_value);
         uartSerial->bufferln(std::to_string(motor_value));
 
         if (motor_value < ESC_FORWARD && motor_value > ESC_BACKWARD) {
@@ -270,7 +270,7 @@ void TestH::sendMotorEncoderRight() {
       controller->setRxStep(enum_step::STEP_WAIT_ACCELERATE);
 
       motor_value = ESC_MID;
-      controller->getMotorRight()->setSpeed(motor_value);
+      controller->getMotorOneshot125Right()->setSpeed(motor_value);
       uartSerial->bufferln(std::to_string(motor_value));
 
       HAL_Delay(3000); // Espera 100 milisegundos
@@ -298,7 +298,7 @@ void TestH::sendMotorEncoderRight() {
           break;
         }
 
-        controller->getMotorRight()->setSpeed(motor_value);
+        controller->getMotorOneshot125Right()->setSpeed(motor_value);
         uartSerial->bufferln(std::to_string(motor_value));
 
         HAL_Delay(100); // Espera 100 milisegundos
@@ -321,7 +321,7 @@ void TestH::sendMotorEncoderRight() {
           motor_value = ESC_MID;
         }
 
-        controller->getMotorRight()->setSpeed(motor_value);
+        controller->getMotorOneshot125Right()->setSpeed(motor_value);
         uartSerial->bufferln(std::to_string(motor_value));
 
         if (motor_value < ESC_FORWARD && motor_value > ESC_BACKWARD) {

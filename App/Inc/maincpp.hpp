@@ -19,7 +19,8 @@ extern "C" {
 #define TOF_ADDR_CENTER 0x23
 
 void main_fura_mode(TIM_HandleTypeDef *htim2,
-		            TIM_HandleTypeDef *htim4,
+                    TIM_HandleTypeDef *htim3,
+		                TIM_HandleTypeDef *htim4,
                     ADC_HandleTypeDef *hadc1,
 					I2C_HandleTypeDef *hi2c1,
 					uint16_t* adc_values_value,

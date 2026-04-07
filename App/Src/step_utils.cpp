@@ -25,8 +25,8 @@ void step_init__end(ControllerBase* controller, enum_step next_step, enum_step s
 }
 
 void step_init__motor(ControllerBase* controller, uint32_t* motor_value){
-  controller->getMotorLeft()->setSpeed(*motor_value);
-  controller->getMotorRight()->setSpeed(*motor_value);
+  controller->getMotorOneshot125Left()->setSpeed(*motor_value);
+  controller->getMotorOneshot125Right()->setSpeed(*motor_value);
   controller->getUartSerial()->bufferln(std::to_string(*motor_value));
 
   HAL_Delay(3000); // Espera 100 milisegundos
@@ -38,8 +38,8 @@ void step_finish__ini(ControllerBase* controller){
 }
 
 void step_finish__motor(ControllerBase* controller){
-  controller->getMotorLeft()->disable();
-  controller->getMotorRight()->disable();
+  controller->getMotorOneshot125Left()->disable();
+  controller->getMotorOneshot125Right()->disable();
 }
 
 void step_finish__end(ControllerBase* controller){
@@ -65,8 +65,8 @@ void step_accelerate__motor(ControllerBase* controller, uint32_t* motor_value, u
       *motor_value = ESC_FORWARD;
     }
 
-    controller->getMotorLeft()->setSpeed(*motor_value);
-    controller->getMotorRight()->setSpeed(*motor_value);
+    controller->getMotorOneshot125Left()->setSpeed(*motor_value);
+    controller->getMotorOneshot125Right()->setSpeed(*motor_value);
     controller->getUartSerial()->bufferln(std::to_string(*motor_value));
 
     HAL_Delay(ramp_ms); // Espera 100 milisegundos
@@ -95,8 +95,8 @@ void step_decelerate__motor(ControllerBase* controller, uint32_t* motor_value, u
       *motor_value = ESC_MID;
     }
 
-    controller->getMotorLeft()->setSpeed(*motor_value);
-    controller->getMotorRight()->setSpeed(*motor_value);
+    controller->getMotorOneshot125Left()->setSpeed(*motor_value);
+    controller->getMotorOneshot125Right()->setSpeed(*motor_value);
     controller->getUartSerial()->bufferln(std::to_string(*motor_value));
 
     if (*motor_value < ESC_FORWARD && *motor_value > ESC_BACKWARD) {
@@ -117,7 +117,7 @@ void step_decelerate_separate__motor(ControllerBase* controller, uint32_t* motor
       if (*motor_left < ESC_FORWARD && *motor_left > ESC_BACKWARD) {
         *motor_left = ESC_MID;
       }
-      controller->getMotorLeft()->setSpeed(*motor_left);
+      controller->getMotorOneshot125Left()->setSpeed(*motor_left);
       if (*motor_left < ESC_FORWARD && *motor_left > ESC_BACKWARD) {
         controller->getUartSerial()->bufferln("Fura: MOTOR STOP");
         motor_left_end = 1;
@@ -129,7 +129,7 @@ void step_decelerate_separate__motor(ControllerBase* controller, uint32_t* motor
       if (*motor_right < ESC_FORWARD && *motor_right > ESC_BACKWARD) {
         *motor_right = ESC_MID;
       }
-      controller->getMotorRight()->setSpeed(*motor_right);
+      controller->getMotorOneshot125Right()->setSpeed(*motor_right);
       if (*motor_right < ESC_FORWARD && *motor_right > ESC_BACKWARD) {
         controller->getUartSerial()->bufferln("Fura: MOTOR STOP");
         motor_right_end = 1;

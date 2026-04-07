@@ -5,9 +5,9 @@
 //#define FURAFOSCAN2 "FURAFOSCA2"
 
 #define FLASH_DATA_VERSION 3
-#define FLASH_DATA_NUM_VALUES 6
+#define FLASH_DATA_NUM_VALUES 7
 
-//#define F_E_ACTIVE_SENSOR_TILTING
+#define F_E_ACTIVE_SENSOR_TILTING
 //#define F_E_ACTIVE_LED_SENSOR_TILTING
 
 #define F_E_ACTIVE_TRACKER_SENSOR_LEFT
@@ -101,10 +101,10 @@
 
 
 
-//#define (*config_motor)[(size_t)enum_motor::F_M_TRACKER_LEFT_IN_DETECT_LINE].value 3000
-//#define (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE].value 3300
-//#define (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE].value 3000
-//#define (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_OUT_DETECT_LINE].value 3300
+#define F_E_TRACKER_LEFT_IN_DETECT_LINE 3000
+#define F_E_TRACKER_LEFT_OUT_DETECT_LINE 3300
+#define F_E_TRACKER_RIGHT_IN_DETECT_LINE 3000
+#define F_E_TRACKER_RIGHT_OUT_DETECT_LINE 3300
 //#define F_E_TRACKER_OUT_OF_LINE_MS 100
 //#define F_E_TRACKER_ROTATE_MS 300
 //#define F_E_TRACKER_OUT_OF_LINE_BOTH_MS 800
@@ -128,10 +128,11 @@
 //#define F_E_DISTANCE_BOTH_BOOST_OUT_MS 1000
 
 #define F_E_TOF_DISTANCE_MIN 0
-#define F_E_TOF_DISTANCE_MAX 450
+#define F_E_TOF_DISTANCE_MAX 300//450
 #define F_E_TOF_DISTANCE_DETECT 0
 
-#define F_E_GYRO_Y_UP 1500
+#define F_E_GYRO_Y_UP_PRE 800
+#define F_E_GYRO_Y_UP_POST 4500
 
 #define F_E_IR_NEC_ON 33456510
 #define F_E_IR_NEC_OK 33474615
@@ -170,6 +171,18 @@
     F_M_ESC_TRACKER_BOTH_SPEED_SLOW,
     F_M_ESC_CHECK,
 
+    F_M_SPEED_RAMP_TIME_INCREMENT_MS,
+    F_M_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS,
+    F_M_SPEED_RAMP_VALUE_INCREMENT,
+    F_M_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK,
+    F_M_SPEED_REFRESH_MS,
+    F_M_SPEED_RAMP_CHECK,
+
+    F_M_TRACKER_OUT_OF_LINE_MS,
+    F_M_TRACKER_ROTATE_MS,
+    F_M_TRACKER_OUT_OF_LINE_BOTH_MS,
+    F_M_TRACKER_CHECK,
+
     F_M_DEFENSE_BACK_FAST,
     F_M_DEFENSE_BACK_SLOW,
     F_M_DEFENSE_SPIN_FRONT,
@@ -186,22 +199,6 @@
     F_M_SENSOR_TILTING_IN_MS,
     F_M_SENSOR_TILTING_OUT_MS,
     F_M_SENSOR_TILTING_CHECK,
-
-    F_M_SPEED_RAMP_TIME_INCREMENT_MS,
-    F_M_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS,
-    F_M_SPEED_RAMP_VALUE_INCREMENT,
-    F_M_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK,
-    F_M_SPEED_REFRESH_MS,
-    F_M_SPEED_RAMP_CHECK,
-
-    F_M_TRACKER_LEFT_IN_DETECT_LINE,
-    F_M_TRACKER_LEFT_OUT_DETECT_LINE,
-    F_M_TRACKER_RIGHT_IN_DETECT_LINE,
-    F_M_TRACKER_RIGHT_OUT_DETECT_LINE,
-    F_M_TRACKER_OUT_OF_LINE_MS,
-    F_M_TRACKER_ROTATE_MS,
-    F_M_TRACKER_OUT_OF_LINE_BOTH_MS,
-    F_M_TRACKER_CHECK,
 
     F_M_DISTANCE_SPEED_SLOW_LEFT,
     F_M_DISTANCE_SPEED_SLOW_RIGHT,
@@ -231,35 +228,18 @@
       constexpr std::array<ConfigValue, (size_t)enum_motor::COUNT> Furafoscan1 = {{
           [(size_t)enum_motor::F_M_ESC_MID_STOP] = { 1920 }, // 1830-2000
           [(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI] = { 2100 },
-          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_LEFT] = { 2200 }, //2110//TTT2200
-          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_RIGHT] = { 2200 }, //2110//TTT2200
-          [(size_t)enum_motor::F_M_ESC_BASE_SLOW] = { 2200 },
-          [(size_t)enum_motor::F_M_ESC_BASE_FAST] = { 2330 },
-          [(size_t)enum_motor::F_M_ESC_TRAKER_SLOW_SPEED] = { 2050 },
-          [(size_t)enum_motor::F_M_ESC_TRACKER_SPEED] = { 2450 },
+          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_LEFT] = { 2300 }, //2110//TTT2200
+          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_RIGHT] = { 2300 }, //2110//TTT2200
+          [(size_t)enum_motor::F_M_ESC_BASE_SLOW] = { 2300 },
+          [(size_t)enum_motor::F_M_ESC_BASE_FAST] = { 2430 },
+          [(size_t)enum_motor::F_M_ESC_TRAKER_SLOW_SPEED] = { 2050 },//No utilizado
+          [(size_t)enum_motor::F_M_ESC_TRACKER_SPEED] = { 2450 },//No utilizado
           [(size_t)enum_motor::F_M_ESC_TRAKER_BACK] = { 1560 }, //1750//TTT1560
           [(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_SLOW] = { 1700 },
-          [(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_FAST] = { 2330 },
-          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_FAST] = { 2500 },
-          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_SLOW] = { 1760 },
+          [(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_FAST] = { 2350 },
+          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_FAST] = { 1400 },
+          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_SLOW] = { 1400 },
           [(size_t)enum_motor::F_M_ESC_CHECK] = { 99999 },
-
-          [(size_t)enum_motor::F_M_DEFENSE_BACK_FAST] = { 1400 },
-          [(size_t)enum_motor::F_M_DEFENSE_BACK_SLOW] = { 1650 },
-          [(size_t)enum_motor::F_M_DEFENSE_SPIN_FRONT] = { 2330 },
-          [(size_t)enum_motor::F_M_DEFENSE_SPIN_BACK] = { 1400 },
-          [(size_t)enum_motor::F_M_DEFENSE_ATTACK] = { 2450 },
-          [(size_t)enum_motor::F_M_DEFENSE_LEFT_OUT_MS] = { 600 },
-          [(size_t)enum_motor::F_M_DEFENSE_RIGHT_OUT_MS] = { 650 },
-          [(size_t)enum_motor::F_M_DEFENSE_SPIN_OUT_MS] = { 550 },
-          [(size_t)enum_motor::F_M_DEFENSE_ATTACK_OUT_MS] = { 650 },
-          [(size_t)enum_motor::F_M_DEFENSE_CHECK] = { 99999 },
-
-          [(size_t)enum_motor::F_M_SENSOR_TILTING_BACK_FAST] = { 1400 },
-          [(size_t)enum_motor::F_M_SENSOR_TILTING_BACK_SLOW] = { 1650 },
-          [(size_t)enum_motor::F_M_SENSOR_TILTING_IN_MS] = { 1 },
-          [(size_t)enum_motor::F_M_SENSOR_TILTING_OUT_MS] = { 1000 },
-          [(size_t)enum_motor::F_M_SENSOR_TILTING_CHECK] = { 99999 },
 
           [(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS] = { 1 },
           [(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS] = { 1 },
@@ -268,46 +248,10 @@
           [(size_t)enum_motor::F_M_SPEED_REFRESH_MS] = { 10 },
           [(size_t)enum_motor::F_M_SPEED_RAMP_CHECK] = { 99999 },
 
-          [(size_t)enum_motor::F_M_TRACKER_LEFT_IN_DETECT_LINE] = { 3000 },
-          [(size_t)enum_motor::F_M_TRACKER_LEFT_OUT_DETECT_LINE] = { 3300 },
-          [(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE] = { 3000 },
-          [(size_t)enum_motor::F_M_TRACKER_RIGHT_OUT_DETECT_LINE] = { 3300 },
           [(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_MS] = { 100 },
-          [(size_t)enum_motor::F_M_TRACKER_ROTATE_MS] = { 300 },
-          [(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS] = { 800 },
+          [(size_t)enum_motor::F_M_TRACKER_ROTATE_MS] = { 200 },
+          [(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS] = { 100 },
           [(size_t)enum_motor::F_M_TRACKER_CHECK] = { 99999 },
-
-          [(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_LEFT] = { 2200 },
-          [(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_RIGHT] = { 2200 },
-          [(size_t)enum_motor::F_M_DISTANCE_SPEED_LEFT] = { 2380 },
-          [(size_t)enum_motor::F_M_DISTANCE_SPEED_RIGHT] = { 2380 },
-          [(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED] = { 2380 },
-          [(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED_BOOST] = { 2550 },
-          [(size_t)enum_motor::F_M_DISTANCE_IN_MS] = { 1 },
-          [(size_t)enum_motor::F_M_DISTANCE_OUT_MS] = { 60 },
-          [(size_t)enum_motor::F_M_DISTANCE_BOTH_OUT_MS] = { 100 },
-          [(size_t)enum_motor::F_M_DISTANCE_CENTER_BOOST_MS] = { 11 },
-          [(size_t)enum_motor::F_M_DISTANCE_BOTH_BOOST_OUT_MS] = { 1000 },
-          [(size_t)enum_motor::F_M_DISTANCE_CHECK] = { 99999 },
-
-
-      }};
-
-      constexpr std::array<ConfigValue, (size_t)enum_motor::COUNT> Furafoscan2 = {{
-          [(size_t)enum_motor::F_M_ESC_MID_STOP] = { 1920 }, // 1830-2000
-          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI] = { 2100 },
-          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_LEFT] = { 2200 }, //2110//TTT2200
-          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_RIGHT] = { 2200 }, //2110//TTT2200
-          [(size_t)enum_motor::F_M_ESC_BASE_SLOW] = { 2200 },
-          [(size_t)enum_motor::F_M_ESC_BASE_FAST] = { 2330 },
-          [(size_t)enum_motor::F_M_ESC_TRAKER_SLOW_SPEED] = { 2050 },
-          [(size_t)enum_motor::F_M_ESC_TRACKER_SPEED] = { 2450 },
-          [(size_t)enum_motor::F_M_ESC_TRAKER_BACK] = { 1560 }, //1750//TTT1560
-          [(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_SLOW] = { 1700 },
-          [(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_FAST] = { 2330 },
-          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_FAST] = { 2500 },
-          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_SLOW] = { 1760 },
-          [(size_t)enum_motor::F_M_ESC_CHECK] = { 99999 },
 
           [(size_t)enum_motor::F_M_DEFENSE_BACK_FAST] = { 1400 },
           [(size_t)enum_motor::F_M_DEFENSE_BACK_SLOW] = { 1650 },
@@ -326,21 +270,68 @@
           [(size_t)enum_motor::F_M_SENSOR_TILTING_OUT_MS] = { 1000 },
           [(size_t)enum_motor::F_M_SENSOR_TILTING_CHECK] = { 99999 },
 
-          [(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS] = { 1 },
-          [(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS] = { 1 },
-          [(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT] = { 2 },
-          [(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK] = { 1 },
+
+          [(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_LEFT] = { 2350 },
+          [(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_RIGHT] = { 2350 },
+          [(size_t)enum_motor::F_M_DISTANCE_SPEED_LEFT] = { 2400 },
+          [(size_t)enum_motor::F_M_DISTANCE_SPEED_RIGHT] = { 2000 },
+          [(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED] = { 2350 },
+          [(size_t)enum_motor::F_M_DISTANCE_BOTH_SPEED_BOOST] = { 2350 },
+          [(size_t)enum_motor::F_M_DISTANCE_IN_MS] = { 1 },
+          [(size_t)enum_motor::F_M_DISTANCE_OUT_MS] = { 20 },
+          [(size_t)enum_motor::F_M_DISTANCE_BOTH_OUT_MS] = { 20 },
+          [(size_t)enum_motor::F_M_DISTANCE_CENTER_BOOST_MS] = { 1 },
+          [(size_t)enum_motor::F_M_DISTANCE_BOTH_BOOST_OUT_MS] = { 20 },
+          [(size_t)enum_motor::F_M_DISTANCE_CHECK] = { 99999 },
+
+
+      }};
+
+      constexpr std::array<ConfigValue, (size_t)enum_motor::COUNT> Furafoscan2 = {{
+          // 1000-2000
+          [(size_t)enum_motor::F_M_ESC_MID_STOP] = { 1500 }, //FF2 1500 falta calcular
+          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_RAMP_INI] = { 1560 }, //FF2
+          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_LEFT] = { 1570 }, //FF2
+          [(size_t)enum_motor::F_M_ESC_BASE_SPEED_RIGHT] = { 1570 }, //FF2
+          [(size_t)enum_motor::F_M_ESC_BASE_SLOW] = { 1570 },//FF2
+          [(size_t)enum_motor::F_M_ESC_BASE_FAST] = { 1650 },//FF2
+          [(size_t)enum_motor::F_M_ESC_TRAKER_SLOW_SPEED] = { 1600 },//No utilizado
+          [(size_t)enum_motor::F_M_ESC_TRACKER_SPEED] = { 1600 },//No utilizado
+          [(size_t)enum_motor::F_M_ESC_TRAKER_BACK] = { 1450 }, //FF2//1750//TTT1560
+          [(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_SLOW] = { 1450 },//FF2
+          [(size_t)enum_motor::F_M_ESC_TRAKER_ROTATE_FAST] = { 1650 },//FF2
+          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_FAST] = { 1600 },//FF2
+          [(size_t)enum_motor::F_M_ESC_TRACKER_BOTH_SPEED_SLOW] = { 1400 },//FF2
+          [(size_t)enum_motor::F_M_ESC_CHECK] = { 99999 },
+
+          [(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_MS] = { 7 }, //FF2
+          [(size_t)enum_motor::F_M_SPEED_RAMP_TIME_INCREMENT_FROM_BACK_MS] = { 7 }, //FF2
+          [(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT] = { 8 }, //FF2
+          [(size_t)enum_motor::F_M_SPEED_RAMP_VALUE_INCREMENT_FROM_BACK] = { 8 }, //FF2
           [(size_t)enum_motor::F_M_SPEED_REFRESH_MS] = { 10 },
           [(size_t)enum_motor::F_M_SPEED_RAMP_CHECK] = { 99999 },
 
-          [(size_t)enum_motor::F_M_TRACKER_LEFT_IN_DETECT_LINE] = { 3000 },
-          [(size_t)enum_motor::F_M_TRACKER_LEFT_OUT_DETECT_LINE] = { 3300 },
-          [(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE] = { 3000 },
-          [(size_t)enum_motor::F_M_TRACKER_RIGHT_OUT_DETECT_LINE] = { 3300 },
-          [(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_MS] = { 100 },
+          [(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_MS] = { 100 }, //FF2
           [(size_t)enum_motor::F_M_TRACKER_ROTATE_MS] = { 300 },
           [(size_t)enum_motor::F_M_TRACKER_OUT_OF_LINE_BOTH_MS] = { 800 },
           [(size_t)enum_motor::F_M_TRACKER_CHECK] = { 99999 },
+
+          [(size_t)enum_motor::F_M_DEFENSE_BACK_FAST] = { 1400 },
+          [(size_t)enum_motor::F_M_DEFENSE_BACK_SLOW] = { 1650 },
+          [(size_t)enum_motor::F_M_DEFENSE_SPIN_FRONT] = { 2330 },
+          [(size_t)enum_motor::F_M_DEFENSE_SPIN_BACK] = { 1400 },
+          [(size_t)enum_motor::F_M_DEFENSE_ATTACK] = { 2450 },
+          [(size_t)enum_motor::F_M_DEFENSE_LEFT_OUT_MS] = { 600 },
+          [(size_t)enum_motor::F_M_DEFENSE_RIGHT_OUT_MS] = { 650 },
+          [(size_t)enum_motor::F_M_DEFENSE_SPIN_OUT_MS] = { 550 },
+          [(size_t)enum_motor::F_M_DEFENSE_ATTACK_OUT_MS] = { 650 },
+          [(size_t)enum_motor::F_M_DEFENSE_CHECK] = { 99999 },
+
+          [(size_t)enum_motor::F_M_SENSOR_TILTING_BACK_FAST] = { 1400 },
+          [(size_t)enum_motor::F_M_SENSOR_TILTING_BACK_SLOW] = { 1650 },
+          [(size_t)enum_motor::F_M_SENSOR_TILTING_IN_MS] = { 1 },
+          [(size_t)enum_motor::F_M_SENSOR_TILTING_OUT_MS] = { 1000 },
+          [(size_t)enum_motor::F_M_SENSOR_TILTING_CHECK] = { 99999 },
 
           [(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_LEFT] = { 2200 },
           [(size_t)enum_motor::F_M_DISTANCE_SPEED_SLOW_RIGHT] = { 2200 },
@@ -383,12 +374,12 @@ class FuraE {
  private:
   ControllerBase* controller;  // Puntero al controlador base
   // Puntero a la tabla activa
-  uint32_t furafosca_type = 1;
+  uint32_t furafoscan_type = 1;
   const std::array<ConfigValue, (size_t)enum_motor::COUNT>* config_motor = nullptr;
 
   enum enum_type_fura {
-    FURAFOSCA1,
-    FURAFOSCA2,
+    T_FURAFOSCAN1 = 1,
+    T_FURAFOSCAN2 = 2,
   };
 
   enum enum_step_fura {
@@ -420,6 +411,7 @@ class FuraE {
   };
 
   enum enum_direction {
+    DIR_NONE,
     DIR_CENTER,
     DIR_LEFT,
     DIR_RIGHT
@@ -442,14 +434,14 @@ class FuraE {
   uint32_t speed_refresh__time_tick_ini = 0;
   uint32_t speed_refresh__time_tick_current = 0;
 
-  uint8_t direction_base = enum_direction::DIR_CENTER;
+  uint8_t direction_base;
   uint32_t esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_LEFT].value;
   uint32_t esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SPEED_RIGHT].value;
 
-  uint32_t tracker_base_left_in_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_LEFT_IN_DETECT_LINE].value;
-  uint32_t tracker_base_right_in_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE].value;
-  uint32_t tracker_base_left_out_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_IN_DETECT_LINE].value;
-  uint32_t tracker_base_right_out_detect_line = (*config_motor)[(size_t)enum_motor::F_M_TRACKER_RIGHT_OUT_DETECT_LINE].value;
+  uint32_t tracker_base_left_in_detect_line = F_E_TRACKER_LEFT_IN_DETECT_LINE;
+  uint32_t tracker_base_right_in_detect_line = F_E_TRACKER_RIGHT_IN_DETECT_LINE;
+  uint32_t tracker_base_left_out_detect_line = F_E_TRACKER_RIGHT_IN_DETECT_LINE;
+  uint32_t tracker_base_right_out_detect_line = F_E_TRACKER_RIGHT_OUT_DETECT_LINE;
   uint32_t tracker_base_iteration = 0;
   uint32_t tracker_base_lap = 0;
   std::vector<uint16_t> tracker_base_left_values;
@@ -539,7 +531,8 @@ class FuraE {
                       uint32_t tracker_base_right_in_detect_line_value,
                       uint32_t tracker_base_left_out_detect_line_value,
                       uint32_t tracker_base_right_out_detect_line_value,
-                      uint32_t rc_address_value);
+                      uint32_t rc_address_value,
+                      uint32_t furafoscan_type_value);
 };
 
 #endif  // FURAE_HPP
