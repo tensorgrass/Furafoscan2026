@@ -17,7 +17,7 @@ FuraE::FuraE(ControllerBase* controllerBaseValue) : controller(controllerBaseVal
     fura_type = rx_data[6];
   }
 
-//  fura_type = enum_type_fura::T_FURAFOSCAN1;
+  fura_type = enum_type_fura::T_FURAFOSCAN1;
 //  fura_type = enum_type_fura::T_FURAFOSCAN2;
 
   switch ((enum_type_fura)fura_type) {
