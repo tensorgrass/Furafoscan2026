@@ -12,6 +12,14 @@
 #define REG_ACCEL_DATA      0x12
 #define REG_COMMAND         0x7E
 
+
+#define REG_ACC_CONF      0x40
+#define REG_ACC_RANGE     0x41
+#define REG_GYR_CONF      0x42
+#define REG_GYR_RANGE     0x43
+#define REG_CONF          0x7A // Register for power mode/performance
+#define REG_COMMAND       0x7E
+
 // Comandos de modo normal
 #define CMD_ACCEL_NORMAL    0x11
 #define CMD_GYRO_NORMAL     0x15

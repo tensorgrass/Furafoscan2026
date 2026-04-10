@@ -14,18 +14,20 @@ FuraE::FuraE(ControllerBase* controllerBaseValue) : controller(controllerBaseVal
     tracker_base_left_out_detect_line = rx_data[3];
     tracker_base_right_out_detect_line = rx_data[4];
     rc_address = rx_data[5];
-    furafoscan_type = rx_data[6];
+    fura_type = rx_data[6];
   }
 
-//  furafoscan_type = enum_type_fura::T_FURAFOSCAN1;
-//  furafoscan_type = enum_type_fura::T_FURAFOSCAN2;
+//  fura_type = enum_type_fura::T_FURAFOSCAN1;
+//  fura_type = enum_type_fura::T_FURAFOSCAN2;
 
-  switch ((enum_type_fura)furafoscan_type) {
+  switch ((enum_type_fura)fura_type) {
     case enum_type_fura::T_FURAFOSCAN1:
       config_motor = &Configs::Furafoscan1;
       break;
     case enum_type_fura::T_FURAFOSCAN2:
       config_motor = &Configs::Furafoscan2;
+      break;
+    case enum_type_fura::T_FURAXICLE:
       break;
   }
 
@@ -36,6 +38,7 @@ void FuraE::main() {
   switch (current_step) {
     case enum_step_fura::STEP_WAIT_BUTTON_START_PRESSED:
       if (current_step_init) {
+        controller->getIRReceiver()->setNecType();
         current_step_init = false;
       }
       if (controller->getButtonStart()->isButtonPressed()) {
@@ -65,6 +68,7 @@ void FuraE::main() {
             button_stop__button_previous_state = 0;
             setDirectionCenter();
             step_after_button = enum_step_fura::STEP_MOTOR_START;
+//            goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
             goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
             break;
           case F_E_IR_NEC_UP:
@@ -72,24 +76,28 @@ void FuraE::main() {
             button_stop__button_previous_state = 0;
             setDirectionCenter();
             step_after_button = enum_step_fura::STEP_MOTOR_START;
-            goNextStep(enum_step_fura::STEP_BUTTON_START_PRESSED);
+            goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
             break;
 
           case F_E_IR_NEC_LEFT:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
-            step_after_button = enum_step_fura::STEP_DEFENSE_LEFT;
+            setDirectionLeft();
+            step_after_button = enum_step_fura::STEP_MOTOR_START;
+//            step_after_button = enum_step_fura::STEP_DEFENSE_LEFT;
             goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
             break;
 
           case F_E_IR_NEC_RIGHT:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
-            step_after_button = enum_step_fura::STEP_DEFENSE_RIGHT;
+            setDirectionRight();
+            step_after_button = enum_step_fura::STEP_MOTOR_START;
+//            step_after_button = enum_step_fura::STEP_DEFENSE_RIGHT;
             goNextStep(enum_step_fura::STEP_WAIT_REMOTE_SUMO);
             break;
 
-          case F_E_IR_NEC_BACK:
+          case F_E_IR_NEC_DOWN:
             controller->getLedStart()->turn_on();
             button_stop__button_previous_state = 0;
             step_after_button = enum_step_fura::STEP_DEFENSE_SPIN;
@@ -249,7 +257,7 @@ void FuraE::main() {
                        tracker_base_left_out_detect_line,
                        tracker_base_right_out_detect_line,
                        rc_address,
-                       furafoscan_type);
+                       fura_type);
 
         tracker_base_left_values.clear();
         tracker_base_right_values.clear();
@@ -328,7 +336,7 @@ void FuraE::main() {
                            tracker_base_left_out_detect_line,
                            tracker_base_right_out_detect_line,
                            rc_address,
-                           furafoscan_type);
+                           fura_type);
             break;
           default:
             rc_num_error1++;
@@ -767,7 +775,7 @@ void FuraE::detectButtonStop() {
       // parar todo y volver al estado inicial
       if (button_stop__button_previous_state == 0) {
         // Se ha pulsado el boton y se tiene que parar todo
-        switch ((enum_type_fura)furafoscan_type) {
+        switch ((enum_type_fura)fura_type) {
           case enum_type_fura::T_FURAFOSCAN1:
             controller->getMotorOneshot125Left()->disable();
             controller->getMotorOneshot125Right()->disable();
@@ -775,6 +783,10 @@ void FuraE::detectButtonStop() {
           case enum_type_fura::T_FURAFOSCAN2:
             controller->getMotorPWMLeft()->disable();
             controller->getMotorPWMRight()->disable();
+            break;
+          case enum_type_fura::T_FURAXICLE:
+            controller->getMotorOneshot125Left()->disable();
+            controller->getMotorOneshot125Right()->disable();
             break;
         }
         button_stop__button_previous_state = 1;
@@ -792,7 +804,7 @@ void FuraE::detectButtonStop() {
     uint32_t command = value.command;
     uint32_t address = value.address;
     if (command == F_E_IR_RC5SUMO_COMMAND_START_STOP && address == rc_address) { //stop
-      switch ((enum_type_fura)furafoscan_type) {
+      switch ((enum_type_fura)fura_type) {
         case enum_type_fura::T_FURAFOSCAN1:
           controller->getMotorOneshot125Left()->disable();
           controller->getMotorOneshot125Right()->disable();
@@ -800,6 +812,10 @@ void FuraE::detectButtonStop() {
         case enum_type_fura::T_FURAFOSCAN2:
           controller->getMotorPWMLeft()->disable();
           controller->getMotorPWMRight()->disable();
+          break;
+        case enum_type_fura::T_FURAXICLE:
+          controller->getMotorOneshot125Left()->disable();
+          controller->getMotorOneshot125Right()->disable();
           break;
       }
       button_stop__button_previous_state = 1;
@@ -1300,7 +1316,7 @@ void FuraE::detectDistanceCenterOut(enum_step_fura next_step, uint32_t time_out_
 }
 
 void FuraE::setMotorSpeed(uint32_t speed_left_value, uint32_t speed_right_value) {
-  switch ((enum_type_fura)furafoscan_type) {
+  switch ((enum_type_fura)fura_type) {
     case enum_type_fura::T_FURAFOSCAN1:
       controller->getMotorOneshot125Left()->setSpeed(speed_left_value);
       controller->getMotorOneshot125Right()->setSpeed(speed_right_value);
@@ -1308,6 +1324,10 @@ void FuraE::setMotorSpeed(uint32_t speed_left_value, uint32_t speed_right_value)
     case enum_type_fura::T_FURAFOSCAN2:
       controller->getMotorPWMLeft()->setSpeed(speed_left_value);
       controller->getMotorPWMRight()->setSpeed(speed_right_value);
+      break;
+    case enum_type_fura::T_FURAXICLE:
+      controller->getMotorOneshot125Left()->setSpeed(speed_left_value);
+      controller->getMotorOneshot125Right()->setSpeed(speed_right_value);
       break;
   }
   speed_left_ini = speed_left_value;
@@ -1341,7 +1361,7 @@ void FuraE::setMotorSpeedRamp(uint32_t speed_left_ini_value, uint32_t speed_left
   }
   speed_right_end = speed_right_end_value;
 
-  switch ((enum_type_fura)furafoscan_type) {
+  switch ((enum_type_fura)fura_type) {
     case enum_type_fura::T_FURAFOSCAN1:
       controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
       controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
@@ -1349,6 +1369,10 @@ void FuraE::setMotorSpeedRamp(uint32_t speed_left_ini_value, uint32_t speed_left
     case enum_type_fura::T_FURAFOSCAN2:
       controller->getMotorPWMLeft()->setSpeed(speed_left_ini);
       controller->getMotorPWMRight()->setSpeed(speed_right_ini);
+      break;
+    case enum_type_fura::T_FURAXICLE:
+      controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
+      controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
       break;
   }
   speed_ramp__time_tick_ini = 0;
@@ -1369,12 +1393,15 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
           if (speed_left_ini > speed_left_end) {
             speed_left_ini = speed_left_end;
           }
-          switch ((enum_type_fura)furafoscan_type) {
+          switch ((enum_type_fura)fura_type) {
             case enum_type_fura::T_FURAFOSCAN1:
               controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
               break;
             case enum_type_fura::T_FURAFOSCAN2:
               controller->getMotorPWMLeft()->setSpeed(speed_left_ini);
+              break;
+            case enum_type_fura::T_FURAXICLE:
+              controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
               break;
           }
         }
@@ -1383,12 +1410,15 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
           if (speed_right_ini > speed_right_end) {
             speed_right_ini = speed_right_end;
           }
-          switch ((enum_type_fura)furafoscan_type) {
+          switch ((enum_type_fura)fura_type) {
             case enum_type_fura::T_FURAFOSCAN1:
               controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
               break;
             case enum_type_fura::T_FURAFOSCAN2:
               controller->getMotorPWMRight()->setSpeed(speed_right_ini);
+              break;
+            case enum_type_fura::T_FURAXICLE:
+              controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
               break;
           }
         }
@@ -1406,7 +1436,7 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
     } else {
       speed_refresh__time_tick_current = HAL_GetTick() - speed_refresh__time_tick_ini;
       if (speed_refresh__time_tick_current >= (*config_motor)[(size_t)enum_motor::F_M_SPEED_REFRESH_MS].value) {
-        switch ((enum_type_fura)furafoscan_type) {
+        switch ((enum_type_fura)fura_type) {
           case enum_type_fura::T_FURAFOSCAN1:
             controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
             controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
@@ -1414,6 +1444,10 @@ void FuraE::rampMotorSpeed(uint32_t speed_ramp_time_increment_ms, uint32_t speed
           case enum_type_fura::T_FURAFOSCAN2:
             controller->getMotorPWMLeft()->setSpeed(speed_left_ini);
             controller->getMotorPWMRight()->setSpeed(speed_right_ini);
+            break;
+          case enum_type_fura::T_FURAXICLE:
+            controller->getMotorOneshot125Left()->setSpeed(speed_left_ini);
+            controller->getMotorOneshot125Right()->setSpeed(speed_right_ini);
             break;
         }
         speed_refresh__time_tick_ini = 0;
@@ -1432,15 +1466,15 @@ void FuraE::setDirectionCenter() {
 void FuraE::setDirectionLeft() {
   if (direction_base != enum_direction::DIR_LEFT) {
     direction_base = enum_direction::DIR_LEFT;
-    esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SLOW].value;
-    esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_FAST].value;
+    esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_FAST].value;
+    esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SLOW].value;
   }
 }
 void FuraE::setDirectionRight() {
   if (direction_base != enum_direction::DIR_RIGHT) {
     direction_base = enum_direction::DIR_RIGHT;
-    esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_FAST].value;
-    esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SLOW].value;
+    esc_speed_base_left = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_SLOW].value;
+    esc_speed_base_right = (*config_motor)[(size_t)enum_motor::F_M_ESC_BASE_FAST].value;
   }
 }
 
@@ -1449,7 +1483,7 @@ void FuraE::writeDataFlash(uint32_t tracker_base_left_in_detect_line_value,
                            uint32_t tracker_base_left_out_detect_line_value,
                            uint32_t tracker_base_right_out_detect_line_value,
                            uint32_t rc_address_value,
-                           uint32_t furafoscan_type_value) {
+                           uint32_t fura_type_value) {
   uint32_t rx_data[FLASH_DATA_NUM_VALUES];
   rx_data[0] = FLASH_DATA_VERSION;
   rx_data[1] = tracker_base_left_in_detect_line_value;
@@ -1457,6 +1491,6 @@ void FuraE::writeDataFlash(uint32_t tracker_base_left_in_detect_line_value,
   rx_data[3] = tracker_base_left_out_detect_line_value;
   rx_data[4] = tracker_base_right_out_detect_line_value;
   rx_data[5] = rc_address_value;
-  rx_data[6] = furafoscan_type_value;
+  rx_data[6] = fura_type_value;
   controller->getFlashMemory()->write(rx_data, FLASH_DATA_NUM_VALUES);
 }
